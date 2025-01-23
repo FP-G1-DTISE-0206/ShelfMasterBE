@@ -13,12 +13,12 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "role")
+@Table(name = "warehouse")
 @SQLRestriction("deleted_at IS NULL")
-public class Role {
+public class Warehouse {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_id_gen")
-    @SequenceGenerator(name = "role_id_gen", sequenceName = "role_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "warehouse_id_gen")
+    @SequenceGenerator(name = "warehouse_id_gen", sequenceName = "warehouse_admins_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -26,6 +26,10 @@ public class Role {
     @NotNull
     @Column(name = "name", nullable = false)
     private String name;
+
+    @NotNull
+    @Column(name = "location", nullable = false, length = Integer.MAX_VALUE)
+    private String location;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -39,7 +43,6 @@ public class Role {
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
-
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now();
@@ -55,5 +58,4 @@ public class Role {
     protected void onRemove() {
         deletedAt = OffsetDateTime.now();
     }
-
 }
