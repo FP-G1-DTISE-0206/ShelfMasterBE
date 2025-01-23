@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 public class CreateProductRequest {
     private String name;
     private BigDecimal price;
+    private List<String> categories;
 
     public Product toEntity() {
         Product product = new Product();
