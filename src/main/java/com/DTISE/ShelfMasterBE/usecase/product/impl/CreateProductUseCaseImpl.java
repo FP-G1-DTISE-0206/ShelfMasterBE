@@ -18,7 +18,7 @@ public class CreateProductUseCaseImpl implements CreateProductUseCase {
 
     @Override
     public CreateProductResponse createProduct(CreateProductRequest req) {
-        if (!productRepository.existsByName(req.getName())) {
+        if (productRepository.existsByName(req.getName())) {
             throw new DuplicateProductNameException("Product name must be unique.");
         }
         Product createdProduct = productRepository.save(req.toEntity());
