@@ -10,7 +10,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -47,9 +46,9 @@ public class Product {
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<ProductCategory> productCategories = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "product_id")
+    private Set<ProductCategory> productCategories;
 
     @PrePersist
     protected void onCreate() {

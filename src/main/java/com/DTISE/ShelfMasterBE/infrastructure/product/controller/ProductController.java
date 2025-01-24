@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -41,6 +42,7 @@ public class ProductController {
         this.deleteProductUseCase = deleteProductUseCase;
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody CreateProductRequest req) {
         return ApiResponse.successfulResponse(
@@ -57,6 +59,7 @@ public class ProductController {
         );
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id,
                                            @RequestBody UpdateProductRequest req) {
@@ -65,6 +68,7 @@ public class ProductController {
                 updateProductUseCase.updateProduct(id, req));
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         deleteProductUseCase.deleteProduct(id);
