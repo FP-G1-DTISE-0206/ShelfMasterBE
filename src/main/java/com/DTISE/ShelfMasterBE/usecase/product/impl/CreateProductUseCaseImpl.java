@@ -2,6 +2,7 @@ package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.DuplicateProductNameException;
+import com.DTISE.ShelfMasterBE.entity.Category;
 import com.DTISE.ShelfMasterBE.entity.Product;
 import com.DTISE.ShelfMasterBE.entity.ProductCategory;
 import com.DTISE.ShelfMasterBE.infrastructure.category.repository.CategoryRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,23 +55,21 @@ public class CreateProductUseCaseImpl implements CreateProductUseCase {
     ) {
         return categories.stream()
                 .map(this::getCategoryIdOrThrow)
-                .map(categoryId -> createProductCategory(productId, categoryId))
+                .map(category -> createProductCategory(productId, category))
                 .map(this::mapProductCategoryResponse)
                 .collect(Collectors.toList());
     }
 
-    private Long getCategoryIdOrThrow(String categoryName) {
-        Long categoryId = categoryRepository.findFirstIdByName(categoryName);
-        if (categoryId == null) {
-            throw new DataNotFoundException("Category with name " + categoryName + " does not exist.");
-        }
-        return categoryId;
+    private Category getCategoryIdOrThrow(String category) {
+        return categoryRepository.findFirstIdByName(category)
+                .orElseThrow(() -> new DataNotFoundException(
+                        "Category with Name " + category + " does not exist."));
     }
 
-    private ProductCategory createProductCategory(Long productId, Long categoryId) {
+    private ProductCategory createProductCategory(Long productId, Category category) {
         ProductCategory productCategory = new ProductCategory();
         productCategory.setProductId(productId);
-        productCategory.setCategoryId(categoryId);
+        productCategory.setCategoryId(category.getId());
         return productCategoryRepository.save(productCategory);
     }
 

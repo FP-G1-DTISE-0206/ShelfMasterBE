@@ -1,7 +1,9 @@
 package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
-//import com.DTISE.ShelfMasterBE.entity.ProductCategory;
+import com.DTISE.ShelfMasterBE.entity.Product;
+import com.DTISE.ShelfMasterBE.entity.ProductCategory;
+import com.DTISE.ShelfMasterBE.infrastructure.category.repository.CategoryRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.*;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductCategoryRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
@@ -10,25 +12,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
-//import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
     private final ProductRepository productRepository;
-    //private final ProductCategoryRepository productCategoryRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductCategoryRepository productCategoryRepository;
 
     public UpdateProductUseCaseImpl(
-            ProductRepository productRepository//,
-            //ProductCategoryRepository productCategoryRepository
+            ProductRepository productRepository,
+            CategoryRepository categoryRepository,
+            ProductCategoryRepository productCategoryRepository
     ) {
         this.productRepository = productRepository;
-        //this.productCategoryRepository = productCategoryRepository;
+        this.categoryRepository = categoryRepository;
+        this.productCategoryRepository = productCategoryRepository;
     }
 
     @Override
     @Transactional
     public UpdateProductResponse updateProduct(Long id, UpdateProductRequest req) {
+        updateProductCategories(id, req.getCategories(), req.getRemovedCategories());
         return productRepository.findById(id)
                 .map(existingProduct -> {
                     existingProduct.setName(req.getName());
@@ -36,52 +44,82 @@ public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
                     existingProduct.setUpdatedAt(OffsetDateTime.now());
                     return productRepository.save(existingProduct);
                 })
-                .map(updatedProduct -> new UpdateProductResponse(
-                        updatedProduct.getId(),
-                        updatedProduct.getName(),
-                        updatedProduct.getPrice(),
-                        updateProductCategories(
-                                id,
-                                req.getCategories(),
-                                req.getRemovedCategories()
-                        )))
+                .map(this::mapToProductResponse)
                 .orElseThrow(() -> new DataNotFoundException(
                         "There's no product with ID: " + id));
     }
 
-    private List<UpdateProductCategoryResponse> updateProductCategories(
+    private UpdateProductResponse mapToProductResponse(Product updatedProduct) {
+        return new UpdateProductResponse(
+                updatedProduct.getId(),
+                updatedProduct.getName(),
+                updatedProduct.getPrice(),
+                mapProductCategoryResponse(updatedProduct.getProductCategories()));
+    }
+
+    private void updateProductCategories(
             Long productId,
             List<UpdateProductCategoryRequest> productCategories,
-            List<UpdateProductCategoryRequest> removedProductCategory
+            List<UpdateProductCategoryRequest> removedProductCategories
     ) {
-        return null;/* productCategories.stream()
-                .map(this::getProductCategoryOrThrow)
-                .map(this::mapProductCategoryResponse)
-                .collect(Collectors.toList());*/
+        for (UpdateProductCategoryRequest productCategory : productCategories) {
+            if (productCategory.getId() != null) {
+                updateProductCategory(productId, productCategory);
+            } else {
+                createProductCategory(productId, productCategory);
+            }
+        }
+
+        for (UpdateProductCategoryRequest categoryReq : removedProductCategories) {
+            if (categoryReq.getId() != null) {
+                removeProductCategory(categoryReq);
+            }
+        }
     }
 
-    /*private ProductCategory getProductCategoryOrThrow(UpdateProductCategoryRequest productCategory) {
-        productCategoryRepository
-                .findById(productCategory.getId())
-                    .map(existingCategory -> {
-                        existingCategory.setDeletedAt(OffsetDateTime.now());
-                        return categoryRepository.save(existingCategory);
-                    })
-                    .orElseThrow(() -> new DataNotFoundException("There's no category with ID: " + id));
+    private void updateProductCategory(Long productId, UpdateProductCategoryRequest productCategory) {
+        categoryRepository.findById(productCategory.getCategoryId())
+                .orElseThrow(() -> new DataNotFoundException(
+                        "Category with ID: " + productCategory.getCategoryId() + " not found."));
+
+        ProductCategory existingProductCategory = productCategoryRepository.findById(productCategory.getId())
+                .orElseThrow(() -> new DataNotFoundException(
+                        "ProductCategory with ID: " + productCategory.getId() + " not found for Product ID: " + productId));
+
+        existingProductCategory.setProductId(productId);
+        existingProductCategory.setCategoryId(productCategory.getCategoryId());
+        existingProductCategory.setUpdatedAt(OffsetDateTime.now());
+        productCategoryRepository.save(existingProductCategory);
     }
 
-    private ProductCategory createProductCategory(Long productId, Long categoryId) {
-        ProductCategory productCategory = new ProductCategory();
-        productCategory.setProductId(productId);
-        productCategory.setCategoryId(categoryId);
-        return productCategoryRepository.save(productCategory);
+    private void createProductCategory(Long productId, UpdateProductCategoryRequest productCategory) {
+        categoryRepository.findById(productCategory.getCategoryId())
+                .orElseThrow(() -> new DataNotFoundException(
+                        "Category with ID: " + productCategory.getCategoryId() + " not found."));
+
+        ProductCategory newProductCategory = productCategory.toEntity();
+        newProductCategory.setProductId(productId);
+        productCategoryRepository.save(newProductCategory);
     }
 
-    private CreateProductCategoryResponse mapProductCategoryResponse(ProductCategory productCategory) {
-        return new CreateProductCategoryResponse(
-                productCategory.getId(),
-                productCategory.getProductId(),
-                productCategory.getCategoryId()
-        );
-    }*/
+    private void removeProductCategory(UpdateProductCategoryRequest categoryReq) {
+        productCategoryRepository.findById(categoryReq.getId())
+                .ifPresent(existingProductCategory -> {
+                    existingProductCategory.setDeletedAt(OffsetDateTime.now());
+                    productCategoryRepository.save(existingProductCategory);
+                });
+    }
+
+    private List<UpdateProductCategoryResponse> mapProductCategoryResponse(
+            Set<ProductCategory> productCategories) {
+        List<UpdateProductCategoryResponse> responses = new ArrayList<>();
+        for (ProductCategory category : productCategories) {
+            responses.add(new UpdateProductCategoryResponse(
+                    category.getId(),
+                    category.getProductId(),
+                    category.getCategoryId()
+            ));
+        }
+        return responses;
+    }
 }

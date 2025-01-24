@@ -44,7 +44,6 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody CreateProductRequest req) {
         return ApiResponse.successfulResponse(
-                HttpStatus.CREATED.value(),
                 "Create new product success",
                 createProductUseCase.createProduct(req));
     }

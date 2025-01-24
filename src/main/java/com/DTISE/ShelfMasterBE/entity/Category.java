@@ -9,6 +9,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -39,6 +41,10 @@ public class Category {
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "category_id"), inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private Set<ProductCategory> productCategories = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
