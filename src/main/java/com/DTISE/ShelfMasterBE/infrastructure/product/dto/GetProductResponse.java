@@ -14,5 +14,5 @@ public class GetProductResponse {
     private Long id;
     private String name;
     private BigDecimal price;
-    private List<GetProductCategoryResponse> categories;
+    private List<Long> categories;
 }

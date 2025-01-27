@@ -41,10 +41,6 @@ public class Category {
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "category_id")
-    private Set<ProductCategory> productCategories;
-
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now();

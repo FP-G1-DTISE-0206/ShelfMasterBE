@@ -14,17 +14,12 @@ import java.util.Set;
 @Service
 public class DeleteCategoryUseCaseImpl implements DeleteCategoryUseCase {
     private final CategoryRepository categoryRepository;
-    private final ProductCategoryRepository productCategoryRepository;
 
-    public DeleteCategoryUseCaseImpl(
-            CategoryRepository categoryRepository,
-            ProductCategoryRepository productCategoryRepository) {
+    public DeleteCategoryUseCaseImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.productCategoryRepository = productCategoryRepository;
     }
 
     @Override
-    @Transactional
     public void deleteCategory(Long id) {
         deleteCategoryFromCategory(id);
     }
@@ -34,16 +29,8 @@ public class DeleteCategoryUseCaseImpl implements DeleteCategoryUseCase {
                 .findById(id)
                 .map(existingCategory -> {
                     existingCategory.setDeletedAt(OffsetDateTime.now());
-                    deleteCategoryFromProductCategories(existingCategory.getProductCategories());
                     return categoryRepository.save(existingCategory);
                 })
                 .orElseThrow(() -> new DataNotFoundException("There's no category with ID: " + id));
-    }
-
-    private void deleteCategoryFromProductCategories(Set<ProductCategory> categories) {
-        categories.forEach(existingCategory -> {
-            existingCategory.setDeletedAt(OffsetDateTime.now());
-            productCategoryRepository.save(existingCategory);
-        });
     }
 }
