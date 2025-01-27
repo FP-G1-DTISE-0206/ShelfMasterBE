@@ -21,14 +21,14 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
     }
 
     @Override
-    public Page<GetProductResponse> getProducts(Pageable pageable) {
-        return productRepository.findAll(pageable)
+    public Page<GetProductResponse> getProducts(Pageable pageable, String search) {
+        return productRepository.findAllBySearch(search, pageable)
                 .map(product -> new GetProductResponse(
                         product.getId(),
                         product.getName(),
                         product.getPrice(),
                         mapProductCategoryResponse(product.getCategories())
-            ));
+                ));
     }
 
     private List<Long> mapProductCategoryResponse(

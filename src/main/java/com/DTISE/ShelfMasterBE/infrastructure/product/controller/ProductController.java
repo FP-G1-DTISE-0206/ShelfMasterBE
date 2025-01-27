@@ -50,12 +50,20 @@ public class ProductController {
                 createProductUseCase.createProduct(req));
     }
 
-    @GetMapping()
-    public ResponseEntity<?> getProducts(@RequestParam Integer start,
-                                       @RequestParam Integer length) {
+    @GetMapping
+    public ResponseEntity<?> getProducts(
+            @RequestParam Integer start,
+            @RequestParam Integer length,
+            @RequestParam String field,
+            @RequestParam String order,
+            @RequestParam String search
+    ) {
         return ApiResponse.successfulResponse(
                 "Products retrieved successfully",
-                Pagination.mapResponse(getProductsUseCase.getProducts(Pagination.createPageable(start, length)))
+                Pagination.mapResponse(getProductsUseCase
+                                .getProducts(
+                                        Pagination.createPageable(start, length, field, order),
+                                        search))
         );
     }
 

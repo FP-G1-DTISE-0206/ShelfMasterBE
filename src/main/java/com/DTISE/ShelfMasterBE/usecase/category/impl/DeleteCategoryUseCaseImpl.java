@@ -1,15 +1,11 @@
 package com.DTISE.ShelfMasterBE.usecase.category.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
-import com.DTISE.ShelfMasterBE.entity.ProductCategory;
 import com.DTISE.ShelfMasterBE.infrastructure.category.repository.CategoryRepository;
-import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductCategoryRepository;
 import com.DTISE.ShelfMasterBE.usecase.category.DeleteCategoryUseCase;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.Set;
 
 @Service
 public class DeleteCategoryUseCaseImpl implements DeleteCategoryUseCase {

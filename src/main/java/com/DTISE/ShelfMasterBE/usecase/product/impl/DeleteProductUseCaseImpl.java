@@ -1,7 +1,6 @@
 package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
-import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductCategoryRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.usecase.product.DeleteProductUseCase;
 import org.springframework.stereotype.Service;
@@ -12,14 +11,9 @@ import java.time.OffsetDateTime;
 @Service
 public class DeleteProductUseCaseImpl implements DeleteProductUseCase {
     private final ProductRepository productRepository;
-    private final ProductCategoryRepository productCategoryRepository;
 
-    public DeleteProductUseCaseImpl(
-            ProductRepository productRepository,
-            ProductCategoryRepository productCategoryRepository
-    ) {
+    public DeleteProductUseCaseImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.productCategoryRepository = productCategoryRepository;
     }
 
     @Override
