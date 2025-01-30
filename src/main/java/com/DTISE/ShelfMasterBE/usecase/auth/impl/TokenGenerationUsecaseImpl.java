@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 public class TokenGenerationUsecaseImpl implements TokenGenerationUsecase {
@@ -47,6 +48,7 @@ public class TokenGenerationUsecaseImpl implements TokenGenerationUsecase {
                 .subject(email)
                 .claim("scope", scope)
                 .claim("userId", user.getId())
+                .claim("imageUrl", Optional.ofNullable(user.getImageUrl()).orElse(""))
                 .claim("type", tokenType.name())
                 .build();
 
@@ -65,6 +67,7 @@ public class TokenGenerationUsecaseImpl implements TokenGenerationUsecase {
                 .subject(jwt.getSubject())
                 .claim("scope", jwt.getClaimAsString("scope"))
                 .claim("userId", jwt.getClaimAsString("userId"))
+                .claim("imageUrl", jwt.getClaimAsString("imageUrl"))
                 .claim("type", TokenType.ACCESS.name())
                 .build();
 

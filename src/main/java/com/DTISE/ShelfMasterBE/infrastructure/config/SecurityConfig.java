@@ -1,5 +1,6 @@
 package com.DTISE.ShelfMasterBE.infrastructure.config;
 
+import com.DTISE.ShelfMasterBE.infrastructure.auth.filters.TokenBlacklist;
 import com.DTISE.ShelfMasterBE.usecase.auth.GetUserAuthDetailsUsecase;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -38,14 +39,14 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final GetUserAuthDetailsUsecase getUserAuthDetailsUsecase;
 //    private final CustomUserDetailsService customUserDetailsService;
-//    private final TokenBlacklist tokenBlacklistFilter;
+    private final TokenBlacklist tokenBlacklistFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-//                .cors(Customizer.withDefaults())
+//                .cors(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(new CorsConfigurationSourceImpl()))
                 .authorizeHttpRequests(auth -> auth
                         //  Define public routes
                         .requestMatchers("/error/**").permitAll()
@@ -62,7 +63,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtDecoder())))
-//                .addFilterAfter(tokenBlacklistFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(tokenBlacklistFilter, BearerTokenAuthenticationFilter.class)
                 .userDetailsService(getUserAuthDetailsUsecase)
                 .build();
     }
