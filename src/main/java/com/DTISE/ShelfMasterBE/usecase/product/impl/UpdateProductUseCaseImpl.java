@@ -69,11 +69,11 @@ public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
                         "Category with ID " + categoryId + " does not exist."));
     }
 
-    private List<Long> mapProductCategoryResponse(
+    private List<CategoryResponse> mapProductCategoryResponse(
             Set<Category> categories) {
-        List<Long> responses = new ArrayList<>();
+        List<CategoryResponse> responses = new ArrayList<>();
         for (Category category : categories) {
-            responses.add(category.getId());
+            responses.add(new CategoryResponse(category.getId(), category.getName()));
         }
         return responses;
     }

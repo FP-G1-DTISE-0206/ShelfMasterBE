@@ -5,6 +5,7 @@ import com.DTISE.ShelfMasterBE.common.exceptions.DuplicateProductNameException;
 import com.DTISE.ShelfMasterBE.entity.Category;
 import com.DTISE.ShelfMasterBE.entity.Product;
 import com.DTISE.ShelfMasterBE.infrastructure.category.repository.CategoryRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CategoryResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CreateProductRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CreateProductResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
@@ -62,10 +63,10 @@ public class CreateProductUseCaseImpl implements CreateProductUseCase {
                 mapProductCategoryResponse(createdProduct.getCategories()));
     }
 
-    private List<Long> mapProductCategoryResponse(Set<Category> categories) {
-        List<Long> responses = new ArrayList<>();
+    private List<CategoryResponse> mapProductCategoryResponse(Set<Category> categories) {
+        List<CategoryResponse> responses = new ArrayList<>();
         for (Category category : categories) {
-            responses.add(category.getId());
+            responses.add(new CategoryResponse(category.getId(), category.getName()));
         }
         return responses;
     }

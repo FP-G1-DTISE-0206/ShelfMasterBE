@@ -1,6 +1,7 @@
 package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
 import com.DTISE.ShelfMasterBE.entity.Category;
+import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CategoryResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.GetProductResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.usecase.product.GetProductsUseCase;
@@ -31,11 +32,11 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
                 ));
     }
 
-    private List<Long> mapProductCategoryResponse(
+    private List<CategoryResponse> mapProductCategoryResponse(
             Set<Category> categories) {
-        List<Long> responses = new ArrayList<>();
+        List<CategoryResponse> responses = new ArrayList<>();
         for (Category category : categories) {
-            responses.add(category.getId());
+            responses.add(new CategoryResponse(category.getId(), category.getName()));
         }
         return responses;
     }
