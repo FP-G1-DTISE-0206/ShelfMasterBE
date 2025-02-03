@@ -52,8 +52,6 @@ public class AuthController {
     public ResponseEntity<?> logout(@Validated @RequestBody LogoutRequest req) {
         var accessToken = Claims.getJwtTokenString();
         req.setAccessToken(accessToken);
-//        log.info("access token: "+req.getAccessToken());
-//        log.info("refresh token: "+req.getRefreshToken());
         return ApiResponse.successfulResponse("Logout successful", logoutUsecase.logoutUser(req));
     }
 
@@ -79,13 +77,5 @@ public class AuthController {
             return ApiResponse.failedResponse("Failed to change password");
         }
         return ApiResponse.successfulResponse("Password changed successfully");
-    }
-
-
-    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
-    @PostMapping("/admin/register")
-    public ResponseEntity<?> adminRegister(@RequestBody AdminRegisterRequest req) {
-        var result = createAdminUsecase.createAdmin(req);
-        return ApiResponse.successfulResponse("Create new user success", result);
     }
 }

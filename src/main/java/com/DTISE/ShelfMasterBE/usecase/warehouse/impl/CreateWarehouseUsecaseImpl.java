@@ -2,6 +2,7 @@ package com.DTISE.ShelfMasterBE.usecase.warehouse.impl;
 
 import com.DTISE.ShelfMasterBE.entity.Warehouse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.CreateWarehouseRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.repository.WarehouseRepository;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.CreateWarehouseUsecase;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,20 @@ public class CreateWarehouseUsecaseImpl implements CreateWarehouseUsecase {
     }
 
     @Override
-    public Warehouse createWarehouse(CreateWarehouseRequest req) {
+    public WarehouseResponse createWarehouse(CreateWarehouseRequest req) {
         try {
-            Warehouse newWarehouse = req.toEntity();
-            return warehouseRepository.save(newWarehouse);
+            return mapCreatedWarehouse(warehouseRepository.save(req.toEntity()));
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create warehouse, " + e.getMessage());
+            throw new RuntimeException("Can't save warehouse, " + e.getMessage());
         }
 
+    }
+
+    public WarehouseResponse mapCreatedWarehouse(Warehouse createdWarehouse) {
+        return new WarehouseResponse(
+                createdWarehouse.getId(),
+                createdWarehouse.getName(),
+                createdWarehouse.getLocation()
+        );
     }
 }

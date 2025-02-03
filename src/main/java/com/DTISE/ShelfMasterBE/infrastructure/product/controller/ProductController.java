@@ -61,9 +61,9 @@ public class ProductController {
         return ApiResponse.successfulResponse(
                 "Products retrieved successfully",
                 Pagination.mapResponse(getProductsUseCase
-                                .getProducts(
-                                        Pagination.createPageable(start, length, field, order),
-                                        search))
+                        .getProducts(
+                                Pagination.createPageable(start, length, field, order),
+                                search))
         );
     }
 

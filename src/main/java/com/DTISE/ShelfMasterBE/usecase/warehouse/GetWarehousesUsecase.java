@@ -1,9 +1,9 @@
 package com.DTISE.ShelfMasterBE.usecase.warehouse;
 
-import com.DTISE.ShelfMasterBE.entity.Warehouse;
+import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface GetWarehousesUsecase {
-    Page<Warehouse> getWarehouses(Pageable pageable, String search);
+    Page<WarehouseResponse> getWarehouses(Pageable pageable, String search);
 }

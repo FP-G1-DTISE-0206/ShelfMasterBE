@@ -1,5 +1,6 @@
 package com.DTISE.ShelfMasterBE.usecase.user.impl;
 
+import com.DTISE.ShelfMasterBE.common.exceptions.DuplicateEmailException;
 import com.DTISE.ShelfMasterBE.entity.Role;
 import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.RegisterRequest;
@@ -28,6 +29,9 @@ public class CreateUserUsecaseImpl implements CreateUserUsecase {
 
     @Override
     public RegisterResponse createUser(RegisterRequest req) {
+        if (userRepository.findByEmail(req.getEmail()).isPresent()) {
+            throw new DuplicateEmailException("Email already exists");
+        }
         User newUser = req.toEntity();
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         Set<Role> roles = new HashSet<>();
