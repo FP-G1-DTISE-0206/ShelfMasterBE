@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class AdminController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> adminRegister(@RequestBody AdminRegisterRequest req) {
+    public ResponseEntity<?> adminRegister(@RequestBody @Validated AdminRegisterRequest req) {
         var result = createAdminUsecase.createAdmin(req);
         return ApiResponse.successfulResponse("Create new user success", result);
     }

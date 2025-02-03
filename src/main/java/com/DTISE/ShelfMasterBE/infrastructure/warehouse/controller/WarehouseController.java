@@ -10,6 +10,7 @@ import com.DTISE.ShelfMasterBE.usecase.warehouse.UpdateWarehouseUsecase;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.GetWarehousesUsecase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -44,13 +45,13 @@ public class WarehouseController {
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PostMapping("")
-    public ResponseEntity<?> createWarehouse(@RequestBody CreateWarehouseRequest req) {
+    public ResponseEntity<?> createWarehouse(@RequestBody @Validated CreateWarehouseRequest req) {
         return ApiResponse.successfulResponse("Warehouse created successfully", createWarehouseUsecase.createWarehouse(req));
     }
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateWarehouse(@RequestBody UpdateWarehouseRequest req, @PathVariable Long id) {
+    public ResponseEntity<?> updateWarehouse(@RequestBody @Validated UpdateWarehouseRequest req, @PathVariable Long id) {
         return ApiResponse.successfulResponse("Warehouse updated successfully", updateWarehouseUsecase.updateWarehouse(req, id));
     }
 

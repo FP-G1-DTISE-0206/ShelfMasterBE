@@ -1,13 +1,10 @@
 package com.DTISE.ShelfMasterBE.usecase.admin.impl;
 
-import com.DTISE.ShelfMasterBE.entity.Category;
-import com.DTISE.ShelfMasterBE.entity.Role;
-import com.DTISE.ShelfMasterBE.entity.User;
+import com.DTISE.ShelfMasterBE.common.tools.AdminWarehouseMapper;
+import com.DTISE.ShelfMasterBE.common.tools.UserRoleMapper;
 import com.DTISE.ShelfMasterBE.entity.Warehouse;
 import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.AdminResponse;
-import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.RoleResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
-import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CategoryResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
 import com.DTISE.ShelfMasterBE.usecase.admin.GetAdminsUsecase;
 import org.springframework.data.domain.Page;
@@ -36,25 +33,10 @@ public class GetAdminsUsecaseImpl implements GetAdminsUsecase {
                         admin.getEmail(),
                         admin.getUserName(),
                         admin.getImageUrl(),
-                        mapAdminRoleResponse(admin.getRoles()),
-                        mapAdminWarehouseResponse(admin.getWarehouses())
+                        UserRoleMapper.mapUserRoleResponse(admin.getRoles()),
+                        AdminWarehouseMapper.mapAdminWarehouseResponse(admin.getWarehouses())
                 ));
     }
-
-    private List<RoleResponse> mapAdminRoleResponse(Set<Role> roles) {
-        List<RoleResponse> responses = new ArrayList<>();
-        for (Role role : roles) {
-            responses.add(new RoleResponse(role.getId(), role.getName()));
-        }
-        return responses;
-    }
-
-    private List<WarehouseResponse> mapAdminWarehouseResponse(Set<Warehouse> warehouses) {
-        List<WarehouseResponse> responses = new ArrayList<>();
-        for (Warehouse warehouse : warehouses) {
-            responses.add(new WarehouseResponse(warehouse.getId(), warehouse.getName(), warehouse.getLocation()));
-        }
-        return responses;
-    }
+    
 
 }

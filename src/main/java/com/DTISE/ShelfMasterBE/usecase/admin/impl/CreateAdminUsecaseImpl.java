@@ -1,6 +1,8 @@
 package com.DTISE.ShelfMasterBE.usecase.admin.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DuplicateEmailException;
+import com.DTISE.ShelfMasterBE.common.tools.AdminWarehouseMapper;
+import com.DTISE.ShelfMasterBE.common.tools.UserRoleMapper;
 import com.DTISE.ShelfMasterBE.entity.Role;
 import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.entity.Warehouse;
@@ -61,22 +63,6 @@ public class CreateAdminUsecaseImpl implements CreateAdminUsecase {
         } catch (Exception e) {
             throw new RuntimeException("Can't save user, " + e.getMessage());
         }
-        return new AdminResponse(newUser.getId(), newUser.getEmail(), newUser.getUserName(), newUser.getImageUrl(), mapAdminRoleResponse(newUser.getRoles()), mapAdminWarehouseResponse(newUser.getWarehouses()));
-    }
-
-    public List<RoleResponse> mapAdminRoleResponse(Set<Role> roles) {
-        List<RoleResponse> responses = new ArrayList<>();
-        for (Role role : roles) {
-            responses.add(new RoleResponse(role.getId(), role.getName()));
-        }
-        return responses;
-    }
-
-    public List<WarehouseResponse> mapAdminWarehouseResponse(Set<Warehouse> warehouses) {
-        List<WarehouseResponse> responses = new ArrayList<>();
-        for (Warehouse warehouse : warehouses) {
-            responses.add(new WarehouseResponse(warehouse.getId(), warehouse.getName(), warehouse.getLocation()));
-        }
-        return responses;
+        return new AdminResponse(newUser.getId(), newUser.getEmail(), newUser.getUserName(), newUser.getImageUrl(), UserRoleMapper.mapUserRoleResponse(newUser.getRoles()), AdminWarehouseMapper.mapAdminWarehouseResponse(newUser.getWarehouses()));
     }
 }
