@@ -13,7 +13,8 @@ CREATE TABLE "public"."user" (
                                  "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  "deleted_at" TIMESTAMP WITH TIME ZONE,
-                                 PRIMARY KEY ( "id" )
+                                 PRIMARY KEY ( "id" ),
+                                 CONSTRAINT "user_email_key" UNIQUE ( "email" )
 )
     WITH ( OIDS=FALSE );
 
