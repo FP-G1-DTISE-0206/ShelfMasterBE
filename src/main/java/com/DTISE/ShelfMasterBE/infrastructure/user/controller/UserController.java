@@ -29,6 +29,6 @@ public class UserController {
     @PutMapping()
     public ResponseEntity<?> updateUser(@RequestBody @Validated UpdateUserRequest req) {
         String email = Claims.getEmailFromJwt();
-        return ApiResponse.successfulResponse("User details retrieved successfully",updateUserUsecase.updateUser(req, email));
+        return ApiResponse.successfulResponse("User updated successfully",updateUserUsecase.updateUser(req, email));
     }
 }
