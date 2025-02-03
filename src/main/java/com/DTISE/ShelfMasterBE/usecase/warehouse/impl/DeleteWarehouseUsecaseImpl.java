@@ -1,5 +1,6 @@
 package com.DTISE.ShelfMasterBE.usecase.warehouse.impl;
 
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.entity.Warehouse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.repository.WarehouseRepository;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.DeleteWarehouseUsecase;
@@ -18,17 +19,13 @@ public class DeleteWarehouseUsecaseImpl implements DeleteWarehouseUsecase {
 
     @Override
     public void deleteWarehouse(Long id) {
-        try {
-            Optional<Warehouse> event = warehouseRepository.findById(id);
-            if (event.isEmpty()) {
-                throw new RuntimeException("Warehouse not found");
-            }
-            Warehouse deletedWarehouse = event.get();
-            deletedWarehouse.setDeletedAt(OffsetDateTime.now());
-            warehouseRepository.save(deletedWarehouse);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Can't delete warehouse, " + e.getMessage());
-        }
+        warehouseRepository
+                .findById(id)
+                .map(existingWarehouse -> {
+                    existingWarehouse.setDeletedAt(OffsetDateTime.now());
+                    return warehouseRepository.save(existingWarehouse);
+                })
+                .orElseThrow(() -> new DataNotFoundException("There's no product with ID: " + id));
     }
+
 }
