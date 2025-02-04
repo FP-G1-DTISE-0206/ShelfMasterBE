@@ -1,16 +1,33 @@
 package com.DTISE.ShelfMasterBE.usecase.auth.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
+import com.DTISE.ShelfMasterBE.entity.Role;
+import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.LoginRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.LoginResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.RoleRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
+import com.DTISE.ShelfMasterBE.usecase.auth.GoogleAuthUsecase;
 import com.DTISE.ShelfMasterBE.usecase.auth.LoginUsecase;
 import com.DTISE.ShelfMasterBE.usecase.auth.TokenGenerationUsecase;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import lombok.extern.java.Log;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Log
 @Service
 public class LoginUsecaseImpl implements LoginUsecase {
     private final long ACCESS_TOKEN_EXPIRY = 900L;
@@ -18,10 +35,16 @@ public class LoginUsecaseImpl implements LoginUsecase {
 
     private final AuthenticationManager authenticationManager;
     private final TokenGenerationUsecase tokenService;
+    private final GoogleAuthUsecase googleAuthUsecase;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
-    public LoginUsecaseImpl(AuthenticationManager authenticationManager, TokenGenerationUsecase tokenService) {
+    public LoginUsecaseImpl(AuthenticationManager authenticationManager, TokenGenerationUsecase tokenService, GoogleAuthUsecase googleAuthUsecase, UserRepository userRepository, RoleRepository roleRepository) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.googleAuthUsecase = googleAuthUsecase;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -39,5 +62,57 @@ public class LoginUsecaseImpl implements LoginUsecase {
         } catch (AuthenticationException e) {
             throw new DataNotFoundException("Wrong credentials");
         }
+    }
+
+    public LoginResponse authenticateWithGoogle(String googleToken) {
+        log.info("Authenticating with Google Token: " + googleToken);
+        GoogleIdToken.Payload payload = googleAuthUsecase.verifyGoogleToken(googleToken);
+
+        if (payload == null) {
+            throw new DataNotFoundException("Invalid Google Token");
+        }
+
+        // Extract user details from token
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+        String picture = (String) payload.get("picture");
+
+        // Check if user exists in the database
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user;
+
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+        } else {
+            // If user doesn't exist, create a new user
+            user = new User();
+            user.setEmail(email);
+            user.setUserName(name);
+            user.setImageUrl(picture);
+            user.setPassword(""); // No password needed for Google login
+            Optional<Role> defaultRole;
+            defaultRole = roleRepository.findByName("USER");
+            if (defaultRole.isEmpty()) {
+                throw new RuntimeException("Default role not found");
+            }
+            user.getRoles().add(defaultRole.get());
+            userRepository.save(user);
+        }
+        Set<Role> roles = user.getRoles();
+        // Convert Set<String> roles to List<GrantedAuthority>
+        List<GrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
+
+        // Create authentication object
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getEmail(), "", authorities);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        // Generate tokens
+        String accessToken = tokenService.generateToken(authentication, TokenGenerationUsecase.TokenType.ACCESS);
+        String refreshToken = tokenService.generateToken(authentication, TokenGenerationUsecase.TokenType.REFRESH);
+
+        return new LoginResponse(accessToken, refreshToken, "Bearer");
     }
 }

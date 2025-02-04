@@ -7,6 +7,8 @@ import com.DTISE.ShelfMasterBE.usecase.admin.CreateAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.auth.*;
 import com.DTISE.ShelfMasterBE.usecase.user.ChangePasswordUsecase;
 import com.DTISE.ShelfMasterBE.usecase.user.CreateUserUsecase;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -26,8 +31,9 @@ public class AuthController {
     private final CheckPasswordUsecase checkPasswordUsecase;
     private final ChangePasswordUsecase changePasswordUsecase;
     private final CreateAdminUsecase createAdminUsecase;
+    private final GoogleAuthUsecase googleAuthUsecase;
 
-    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase) {
+    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase) {
         this.loginUsecase = loginUsecase;
         this.createUserUsecase = createUserUsecase;
         this.logoutUsecase = logoutUsecase;
@@ -35,6 +41,7 @@ public class AuthController {
         this.checkPasswordUsecase = checkPasswordUsecase;
         this.changePasswordUsecase = changePasswordUsecase;
         this.createAdminUsecase = createAdminUsecase;
+        this.googleAuthUsecase = googleAuthUsecase;
     }
 
     @PostMapping("/login")
@@ -77,5 +84,12 @@ public class AuthController {
             return ApiResponse.failedResponse("Failed to change password");
         }
         return ApiResponse.successfulResponse("Password changed successfully");
+    }
+
+    @PostMapping("/google-login")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> requestBody) {
+        log.info(" Google login request received: " + requestBody.toString());
+        String googleToken = requestBody.get("token");
+        return ApiResponse.successfulResponse("Login successful", loginUsecase.authenticateWithGoogle(googleToken));
     }
 }
