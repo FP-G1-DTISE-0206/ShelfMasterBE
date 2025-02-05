@@ -1,32 +1,38 @@
 package com.DTISE.ShelfMasterBE.usecase.auth.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
-import com.DTISE.ShelfMasterBE.common.tools.UserRoleMapper;
-import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
-import com.DTISE.ShelfMasterBE.infrastructure.user.dto.UserResponse;
-import com.DTISE.ShelfMasterBE.usecase.auth.VerifyEmailUsecase;
+import com.DTISE.ShelfMasterBE.usecase.auth.SetupPasswordUsecase;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 
 @Service
-public class VerifyEmailUsecaseImpl implements VerifyEmailUsecase {
+public class SetupPasswordUsecaseImpl implements SetupPasswordUsecase {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public VerifyEmailUsecaseImpl(UserRepository userRepository) {
+    public SetupPasswordUsecaseImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public void verifyUser(String token) {
+    @Transactional
+    public void setupPassword(String token, String password) {
         userRepository.findByVerificationToken(token)
                 .ifPresentOrElse(
                         user -> {
                             if (user.getTokenExpiry() != null && user.getTokenExpiry().isBefore(OffsetDateTime.now())) {
                                 throw new DataNotFoundException("Token has expired.");
                             }
+                            user.setPassword(passwordEncoder.encode(password));
+                            user.setIsVerified(true);
+                            user.setVerificationToken(null); // Remove token after verification
+                            user.setTokenExpiry(null);
+                            userRepository.save(user);
                         },
                         () -> {
                             throw new DataNotFoundException("Invalid or expired token.");

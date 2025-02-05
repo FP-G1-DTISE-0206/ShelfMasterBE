@@ -30,8 +30,9 @@ public class AuthController {
     private final CreateAdminUsecase createAdminUsecase;
     private final GoogleAuthUsecase googleAuthUsecase;
     private final VerifyEmailUsecase verifyEmailUsecase;
+    private final SetupPasswordUsecase setupPasswordUsecase;
 
-    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase, VerifyEmailUsecase verifyEmailUsecase) {
+    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase, VerifyEmailUsecase verifyEmailUsecase, SetupPasswordUsecase setupPasswordUsecase) {
         this.loginUsecase = loginUsecase;
         this.createUserUsecase = createUserUsecase;
         this.logoutUsecase = logoutUsecase;
@@ -41,6 +42,7 @@ public class AuthController {
         this.createAdminUsecase = createAdminUsecase;
         this.googleAuthUsecase = googleAuthUsecase;
         this.verifyEmailUsecase = verifyEmailUsecase;
+        this.setupPasswordUsecase = setupPasswordUsecase;
     }
 
     @PostMapping("/login")
@@ -95,6 +97,12 @@ public class AuthController {
     @GetMapping("/verify")
     public ResponseEntity<?> verifyEmail(@RequestParam String token) {
         verifyEmailUsecase.verifyUser(token);
-        return ApiResponse.successfulResponse("Email verified successfully! You can now log in.");
+        return ApiResponse.successfulResponse("Email verified successfully! You can now set up your password.");
+    }
+
+    @PostMapping("/setup-password")
+    public ResponseEntity<?> setupPassword(@RequestBody @Validated SetupPasswordRequest req) {
+        setupPasswordUsecase.setupPassword(req.getToken(), req.getPassword());
+        return ApiResponse.successfulResponse("Password setup successful! You can now log in.");
     }
 }

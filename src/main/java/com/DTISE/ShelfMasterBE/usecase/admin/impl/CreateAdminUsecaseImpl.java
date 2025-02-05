@@ -43,6 +43,7 @@ public class CreateAdminUsecaseImpl implements CreateAdminUsecase {
         }
         User newUser = req.toEntity();
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        newUser.setIsVerified(true);
         Set<Role> roles = new HashSet<>();
         newUser.setRoles(roles);
         Optional<Role> defaultRole;

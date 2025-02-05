@@ -22,16 +22,29 @@ public class SendEmailUsecaseImpl implements SendEmailUsecase {
     @Override
     public void sendVerificationEmail(String emailDestination, String token) {
         try {
-            String subject = "Verify Your Email";
+            String subject = "ShelfMaster - Verify Your Email";
+
             String verificationUrl = protocol + "://" + host + ":" + port + "/api/v1/auth/verify?token=" + token;
-            String content = "<p>Click the link below to verify your email:</p>"
-                    + "<p><a href=\"" + verificationUrl + "\">Verify Email</a></p>";
+
+            String content = "<div style=\"font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;\">"
+                    + "<div style=\"max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
+                    + "<h2 style=\"color: #333; text-align: center;\">Welcome to ShelfMaster!</h2>"
+                    + "<p style=\"color: #555;\">You're almost ready to start using ShelfMaster. Please confirm your email by clicking the button below:</p>"
+                    + "<div style=\"text-align: center; margin: 20px 0;\">"
+                    + "<a href=\"" + verificationUrl + "\" style=\"background-color: #28a745; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;\">Verify Email</a>"
+                    + "</div>"
+                    + "<p style=\"color: #777;\">This link will expire in <b>one hour</b>. If you did not request this email, please ignore it.</p>"
+                    + "<p style=\"color: #777; text-align: center;\">&copy; 2025 ShelfMaster</p>"
+                    + "</div>"
+                    + "</div>";
+
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(emailDestination);
             helper.setSubject(subject);
             helper.setText(content, true);
             mailSender.send(message);
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to send verification email, " + e.getMessage());
         }

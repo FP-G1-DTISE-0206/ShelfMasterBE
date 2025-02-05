@@ -41,7 +41,7 @@ public class CreateUserUsecaseImpl implements CreateUserUsecase {
         }
         String verificationToken = UUID.randomUUID().toString();
         User newUser = req.toEntity();
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        newUser.setPassword("");
         newUser.setVerificationToken(verificationToken);
         newUser.setTokenExpiry(OffsetDateTime.now().plusMinutes(10));
         Set<Role> roles = new HashSet<>();
