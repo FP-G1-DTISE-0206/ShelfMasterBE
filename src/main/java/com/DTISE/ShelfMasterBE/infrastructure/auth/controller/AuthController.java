@@ -13,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -32,8 +29,9 @@ public class AuthController {
     private final ChangePasswordUsecase changePasswordUsecase;
     private final CreateAdminUsecase createAdminUsecase;
     private final GoogleAuthUsecase googleAuthUsecase;
+    private final VerifyEmailUsecase verifyEmailUsecase;
 
-    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase) {
+    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase, VerifyEmailUsecase verifyEmailUsecase) {
         this.loginUsecase = loginUsecase;
         this.createUserUsecase = createUserUsecase;
         this.logoutUsecase = logoutUsecase;
@@ -42,6 +40,7 @@ public class AuthController {
         this.changePasswordUsecase = changePasswordUsecase;
         this.createAdminUsecase = createAdminUsecase;
         this.googleAuthUsecase = googleAuthUsecase;
+        this.verifyEmailUsecase = verifyEmailUsecase;
     }
 
     @PostMapping("/login")
@@ -91,5 +90,11 @@ public class AuthController {
         log.info(" Google login request received: " + requestBody.toString());
         String googleToken = requestBody.get("token");
         return ApiResponse.successfulResponse("Login successful", loginUsecase.authenticateWithGoogle(googleToken));
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+        verifyEmailUsecase.verifyUser(token);
+        return ApiResponse.successfulResponse("Email verified successfully! You can now log in.");
     }
 }

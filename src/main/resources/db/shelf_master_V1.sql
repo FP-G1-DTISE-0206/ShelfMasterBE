@@ -10,6 +10,8 @@ CREATE TABLE "public"."user" (
                                  "user_name" CHARACTER VARYING(255) NOT NULL,
                                  "password" CHARACTER VARYING NOT NULL,
                                  "image_url" TEXT,
+                                 "is_verified" BOOLEAN NOT NULL DEFAULT false,
+                                 "verification_token" CHARACTER VARYING,
                                  "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  "deleted_at" TIMESTAMP WITH TIME ZONE,
