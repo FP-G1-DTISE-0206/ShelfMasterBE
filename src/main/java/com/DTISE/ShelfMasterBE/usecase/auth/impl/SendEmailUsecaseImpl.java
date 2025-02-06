@@ -24,7 +24,7 @@ public class SendEmailUsecaseImpl implements SendEmailUsecase {
         try {
             String subject = "ShelfMaster - Verify Your Email";
 
-            String verificationUrl = protocol + "://" + host + ":" + port + "/api/v1/auth/verify?token=" + token;
+            String verificationUrl = protocol + "://" + host + ":" + port + "/setup-account?token=" + token;
 
             String content = "<div style=\"font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;\">"
                     + "<div style=\"max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"

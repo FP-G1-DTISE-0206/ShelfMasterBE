@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class CreateUserUsecaseImpl implements CreateUserUsecase {
@@ -36,30 +33,36 @@ public class CreateUserUsecaseImpl implements CreateUserUsecase {
     @Override
     @Transactional
     public RegisterResponse createUser(RegisterRequest req) {
-        if (userRepository.findByEmail(req.getEmail()).isPresent()) {
-            throw new DuplicateEmailException("Email already exists");
+        Optional<User> existingUser = userRepository.findByEmail(req.getEmail());
+        if (existingUser.isPresent()) {
+            User newUser = existingUser.get();
+            if (newUser.getIsVerified()) {
+                throw new DuplicateEmailException("Email already exists");
+            }
+            return seedUser(newUser, req);
         }
-        String verificationToken = UUID.randomUUID().toString();
-        User newUser = req.toEntity();
+        return seedUser(new User(), req);
+    }
+
+    private RegisterResponse seedUser(User newUser, RegisterRequest req) {
+        if (newUser.getId() == null) { // If the user is new, initialize it from request
+            newUser = req.toEntity();
+            Role defaultRole = roleRepository.findByName("USER")
+                    .orElseThrow(() -> new RuntimeException("Default role not found"));
+
+            newUser.setRoles(Collections.singleton(defaultRole));
+        }
+        newUser.setUserName("");
         newUser.setPassword("");
-        newUser.setVerificationToken(verificationToken);
+        newUser.setVerificationToken(UUID.randomUUID().toString());
         newUser.setTokenExpiry(OffsetDateTime.now().plusMinutes(10));
-        Set<Role> roles = new HashSet<>();
-        newUser.setRoles(roles);
-        Optional<Role> defaultRole;
-        defaultRole = roleRepository.findByName("USER");
-        if (defaultRole.isEmpty()) {
-            throw new RuntimeException("Default role not found");
-        }
-        newUser.getRoles().add(defaultRole.get());
         try {
-            newUser = userRepository.save(newUser);
+            User savedUser = userRepository.save(newUser);
+            sendEmailUsecase.sendVerificationEmail(savedUser.getEmail(), savedUser.getVerificationToken());
+            return new RegisterResponse(savedUser.getId(), savedUser.getEmail());
         } catch (Exception e) {
             throw new RuntimeException("Can't save user, " + e.getMessage());
         }
-        sendEmailUsecase.sendVerificationEmail(newUser.getEmail(), newUser.getVerificationToken());
-
-        return new RegisterResponse(newUser.getId(), newUser.getEmail());
     }
 
 }
