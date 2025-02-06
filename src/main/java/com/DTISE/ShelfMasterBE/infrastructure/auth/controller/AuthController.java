@@ -7,16 +7,10 @@ import com.DTISE.ShelfMasterBE.usecase.admin.CreateAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.auth.*;
 import com.DTISE.ShelfMasterBE.usecase.user.ChangePasswordUsecase;
 import com.DTISE.ShelfMasterBE.usecase.user.CreateUserUsecase;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -32,8 +26,10 @@ public class AuthController {
     private final ChangePasswordUsecase changePasswordUsecase;
     private final CreateAdminUsecase createAdminUsecase;
     private final GoogleAuthUsecase googleAuthUsecase;
+    private final VerifyEmailUsecase verifyEmailUsecase;
+    private final SetupAccountUsecase setupAccountUsecase;
 
-    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase) {
+    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase, VerifyEmailUsecase verifyEmailUsecase, SetupAccountUsecase setupAccountUsecase) {
         this.loginUsecase = loginUsecase;
         this.createUserUsecase = createUserUsecase;
         this.logoutUsecase = logoutUsecase;
@@ -42,6 +38,8 @@ public class AuthController {
         this.changePasswordUsecase = changePasswordUsecase;
         this.createAdminUsecase = createAdminUsecase;
         this.googleAuthUsecase = googleAuthUsecase;
+        this.verifyEmailUsecase = verifyEmailUsecase;
+        this.setupAccountUsecase = setupAccountUsecase;
     }
 
     @PostMapping("/login")
@@ -52,7 +50,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody RegisterRequest req) {
         var result = createUserUsecase.createUser(req);
-        return ApiResponse.successfulResponse("Create new user success", result);
+        return ApiResponse.successfulResponse("Create new user success, please check your email for verification.", result);
     }
 
     @PostMapping("/logout")
@@ -91,5 +89,17 @@ public class AuthController {
         log.info(" Google login request received: " + requestBody.toString());
         String googleToken = requestBody.get("token");
         return ApiResponse.successfulResponse("Login successful", loginUsecase.authenticateWithGoogle(googleToken));
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+        verifyEmailUsecase.verifyUser(token);
+        return ApiResponse.successfulResponse("Email verified successfully! You can now set up your password.");
+    }
+
+    @PostMapping("/setup-account")
+    public ResponseEntity<?> setupAccount(@RequestBody @Validated SetupAccountRequest req) {
+        setupAccountUsecase.setupAccount(req);
+        return ApiResponse.successfulResponse("Password setup successful! You can now log in.");
     }
 }

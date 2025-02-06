@@ -62,6 +62,17 @@ public class User {
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
+    @NotNull
+    @ColumnDefault("false")
+    @Column(name = "is_verified", nullable = false)
+    private Boolean isVerified = false;
+
+    @Column(name = "verification_token", length = Integer.MAX_VALUE)
+    private String verificationToken;
+
+    @Column(name = "token_expiry")
+    private OffsetDateTime tokenExpiry;
+
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now();

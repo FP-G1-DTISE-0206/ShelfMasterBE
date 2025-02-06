@@ -54,6 +54,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/google-login").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
+                        .requestMatchers("/api/v1/auth/verify").permitAll()
+                        .requestMatchers("/api/v1/auth/setup-account").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/event").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/event/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/review/average_stars").permitAll()
