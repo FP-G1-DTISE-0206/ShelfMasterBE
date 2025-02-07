@@ -114,22 +114,15 @@ public class AuthController {
         return ApiResponse.successfulResponse("Please check your email for the reset link.");
     }
 
-    @PostMapping("/setup-password")
-    public ResponseEntity<?> setupPassword(@RequestBody @Validated SetupPasswordRequest req) {
-        String email = Claims.getEmailFromJwt();
-        setupPasswordUsecase.setupPassword(email,req);
-        return ApiResponse.successfulResponse("Password changed successfully");
-    }
-
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody @Validated RegisterRequest req) {
         resetPasswordUsecase.resetPassword(req.getEmail());
         return ApiResponse.successfulResponse("Please check your email for the reset link.");
     }
 
-    @PostMapping("/setup-forgotten-password")
+    @PostMapping("/setup-password")
     public ResponseEntity<?> setupForgottenPassword(@RequestBody @Validated SetupPasswordRequest req) {
-        setupPasswordUsecase.setupForgottenPassword(req);
+        setupPasswordUsecase.setupPassword(req);
         return ApiResponse.successfulResponse("Password changed successfully");
     }
 }

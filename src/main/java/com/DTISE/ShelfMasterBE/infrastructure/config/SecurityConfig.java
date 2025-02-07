@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/verify").permitAll()
                         .requestMatchers("/api/v1/auth/setup-account").permitAll()
                         .requestMatchers("/api/v1/auth/forgot-password").permitAll()
-                        .requestMatchers("/api/v1/auth/setup-forgotten-password").permitAll()
+                        .requestMatchers("/api/v1/auth/setup-password").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/event").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/event/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/review/average_stars").permitAll()

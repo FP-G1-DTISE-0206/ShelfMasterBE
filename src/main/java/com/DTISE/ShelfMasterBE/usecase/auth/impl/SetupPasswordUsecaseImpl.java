@@ -20,26 +20,7 @@ public class SetupPasswordUsecaseImpl implements SetupPasswordUsecase {
     }
 
     @Override
-    public void setupPassword(String email, SetupPasswordRequest req) {
-        userRepository.findByVerificationTokenAndEmail(req.getToken(),email)
-                .ifPresentOrElse(
-                        user -> {
-                            if (user.getTokenExpiry() != null && user.getTokenExpiry().isBefore(OffsetDateTime.now())) {
-                                throw new DataNotFoundException("Token has expired.");
-                            }
-                            user.setPassword(passwordEncoder.encode(req.getPassword()));
-                            user.setVerificationToken(null); // Remove token after verification
-                            user.setTokenExpiry(null);
-                            userRepository.save(user);
-                        },
-                        () -> {
-                            throw new DataNotFoundException("Invalid or expired token.");
-                        }
-                );
-    }
-
-    @Override
-    public void setupForgottenPassword(SetupPasswordRequest req) {
+    public void setupPassword(SetupPasswordRequest req) {
         userRepository.findByVerificationToken(req.getToken())
                 .ifPresentOrElse(
                         user -> {
