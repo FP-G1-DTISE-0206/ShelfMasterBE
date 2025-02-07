@@ -28,8 +28,10 @@ public class AuthController {
     private final GoogleAuthUsecase googleAuthUsecase;
     private final VerifyEmailUsecase verifyEmailUsecase;
     private final SetupAccountUsecase setupAccountUsecase;
+    private final ResetPasswordUsecase resetPasswordUsecase;
+    private final SetupPasswordUsecase setupPasswordUsecase;
 
-    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase, VerifyEmailUsecase verifyEmailUsecase, SetupAccountUsecase setupAccountUsecase) {
+    public AuthController(LoginUsecase loginUsecase, CreateUserUsecase createUserUsecase, LogoutUsecase logoutUsecase, TokenRefreshUsecase tokenRefreshUsecase, CheckPasswordUsecase checkPasswordUsecase, ChangePasswordUsecase changePasswordUsecase, CreateAdminUsecase createAdminUsecase, GoogleAuthUsecase googleAuthUsecase, VerifyEmailUsecase verifyEmailUsecase, SetupAccountUsecase setupAccountUsecase, ResetPasswordUsecase resetPasswordUsecase, SetupPasswordUsecase setupPasswordUsecase) {
         this.loginUsecase = loginUsecase;
         this.createUserUsecase = createUserUsecase;
         this.logoutUsecase = logoutUsecase;
@@ -40,6 +42,8 @@ public class AuthController {
         this.googleAuthUsecase = googleAuthUsecase;
         this.verifyEmailUsecase = verifyEmailUsecase;
         this.setupAccountUsecase = setupAccountUsecase;
+        this.resetPasswordUsecase = resetPasswordUsecase;
+        this.setupPasswordUsecase = setupPasswordUsecase;
     }
 
     @PostMapping("/login")
@@ -70,19 +74,19 @@ public class AuthController {
         return ApiResponse.successfulResponse("Refresh successful", tokenRefreshUsecase.refreshAccessToken(token));
     }
 
-    @PostMapping("/change_password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest req) {
-        String email = Claims.getEmailFromJwt();
-        boolean isPasswordCorrect = checkPasswordUsecase.checkPassword(email, req.getOldPassword());
-        if (!isPasswordCorrect) {
-            return ApiResponse.failedResponse("Old password is incorrect");
-        }
-        boolean result = changePasswordUsecase.changePassword(req, email);
-        if (!result) {
-            return ApiResponse.failedResponse("Failed to change password");
-        }
-        return ApiResponse.successfulResponse("Password changed successfully");
-    }
+//    @PostMapping("/change_password")
+//    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest req) {
+//        String email = Claims.getEmailFromJwt();
+//        boolean isPasswordCorrect = checkPasswordUsecase.checkPassword(email, req.getOldPassword());
+//        if (!isPasswordCorrect) {
+//            return ApiResponse.failedResponse("Old password is incorrect");
+//        }
+//        boolean result = changePasswordUsecase.changePassword(req, email);
+//        if (!result) {
+//            return ApiResponse.failedResponse("Failed to change password");
+//        }
+//        return ApiResponse.successfulResponse("Password changed successfully");
+//    }
 
     @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> requestBody) {
@@ -101,5 +105,31 @@ public class AuthController {
     public ResponseEntity<?> setupAccount(@RequestBody @Validated SetupAccountRequest req) {
         setupAccountUsecase.setupAccount(req);
         return ApiResponse.successfulResponse("Password setup successful! You can now log in.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword() {
+        String email = Claims.getEmailFromJwt();
+        resetPasswordUsecase.resetPassword(email);
+        return ApiResponse.successfulResponse("Please check your email for the reset link.");
+    }
+
+    @PostMapping("/setup-password")
+    public ResponseEntity<?> setupPassword(@RequestBody @Validated SetupPasswordRequest req) {
+        String email = Claims.getEmailFromJwt();
+        setupPasswordUsecase.setupPassword(email,req);
+        return ApiResponse.successfulResponse("Password changed successfully");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody @Validated RegisterRequest req) {
+        resetPasswordUsecase.resetPassword(req.getEmail());
+        return ApiResponse.successfulResponse("Please check your email for the reset link.");
+    }
+
+    @PostMapping("/setup-forgotten-password")
+    public ResponseEntity<?> setupForgottenPassword(@RequestBody @Validated SetupPasswordRequest req) {
+        setupPasswordUsecase.setupForgottenPassword(req);
+        return ApiResponse.successfulResponse("Password changed successfully");
     }
 }

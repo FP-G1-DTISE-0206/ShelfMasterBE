@@ -21,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAdminsBySearch(@Param("search") String search, Pageable pageable);
 
     Optional<User> findByVerificationToken(String token);
+
+    Optional<User> findByVerificationTokenAndEmail(String verificationToken, String email);
 }
