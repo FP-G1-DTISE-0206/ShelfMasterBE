@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface GetCategoriesUseCase {
-    Page<GetCategoryResponse> getCategories(Pageable pageable);
+    Page<GetCategoryResponse> getCategories(Pageable pageable, String search);
 }

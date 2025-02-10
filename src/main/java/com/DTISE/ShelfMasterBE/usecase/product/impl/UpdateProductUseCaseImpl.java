@@ -1,6 +1,7 @@
 package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
+import com.DTISE.ShelfMasterBE.common.exceptions.DuplicateProductNameException;
 import com.DTISE.ShelfMasterBE.entity.Category;
 import com.DTISE.ShelfMasterBE.entity.Product;
 import com.DTISE.ShelfMasterBE.infrastructure.category.repository.CategoryRepository;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -33,6 +35,7 @@ public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
     public UpdateProductResponse updateProduct(Long id, UpdateProductRequest req) {
         return productRepository.findById(id)
                 .map(existingProduct -> {
+                    checkProductNameAvailable(id, req);
                     existingProduct.setName(req.getName());
                     existingProduct.setPrice(req.getPrice());
                     existingProduct.setUpdatedAt(OffsetDateTime.now());
@@ -42,6 +45,13 @@ public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
                 .map(this::mapUpdateProductResponse)
                 .orElseThrow(() -> new DataNotFoundException(
                         "There's no product with ID: " + id));
+    }
+
+    private void checkProductNameAvailable(Long id, UpdateProductRequest req) {
+        Optional<Product> existingProduct = productRepository.getFirstByName(req.getName());
+        if (existingProduct.isPresent() && !existingProduct.get().getId().equals(req.getId())) {
+            throw new DuplicateProductNameException("Product with this name already exists");
+        }
     }
 
     private UpdateProductResponse mapUpdateProductResponse(Product updatedProduct) {

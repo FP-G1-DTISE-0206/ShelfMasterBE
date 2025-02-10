@@ -1,7 +1,9 @@
 package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.entity.Category;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CategoryResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.product.dto.GetProductDetailResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.GetProductResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.usecase.product.GetProductsUseCase;
@@ -30,6 +32,19 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
                         product.getPrice(),
                         mapProductCategoryResponse(product.getCategories())
                 ));
+    }
+
+    @Override
+    public GetProductDetailResponse getProductDetail(Long id) {
+        return productRepository.findById(id)
+                .map(product -> new GetProductDetailResponse(
+                        product.getId(),
+                        product.getName(),
+                        product.getPrice(),
+                        mapProductCategoryResponse(product.getCategories())
+                ))
+                .orElseThrow(() -> new DataNotFoundException(
+                        "Product not found with id: " + id));
     }
 
     private List<CategoryResponse> mapProductCategoryResponse(

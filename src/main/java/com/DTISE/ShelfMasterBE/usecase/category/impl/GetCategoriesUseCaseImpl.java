@@ -16,8 +16,8 @@ public class GetCategoriesUseCaseImpl implements GetCategoriesUseCase {
     }
 
     @Override
-    public Page<GetCategoryResponse> getCategories(Pageable pageable) {
-        return categoryRepository.findAll(pageable)
+    public Page<GetCategoryResponse> getCategories(Pageable pageable, String search) {
+        return categoryRepository.findAllBySearch(search, pageable)
                 .map(category -> new GetCategoryResponse(
                         category.getId(),
                         category.getName()

@@ -67,6 +67,15 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProductDetail(
+            @PathVariable Long id
+    ) {
+        return ApiResponse.successfulResponse(
+                "Product retrieved successfully",
+                getProductsUseCase.getProductDetail(id));
+    }
+
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id,

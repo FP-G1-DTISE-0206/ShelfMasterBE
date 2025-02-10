@@ -7,8 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Boolean existsByName(String name);
+    Optional<Product> getFirstByName(String name);
 
     @Query("""
         SELECT p FROM Product p LEFT JOIN p.categories c
