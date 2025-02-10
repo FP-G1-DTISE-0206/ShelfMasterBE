@@ -30,9 +30,21 @@ public class Product {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "sku", nullable = false)
+    private String sku;
+
+    @Column(name = "description")
+    private String description;
+
     @NotNull
     @Column(name = "price", precision = 15, scale = 2)
     private BigDecimal price;
+
+    @NotNull
+    @Column(name = "weight", precision = 10, scale = 2)
+    private BigDecimal weight;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -47,12 +59,20 @@ public class Product {
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "product_id")
+    private Set<ProductImage> images = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "product_id")
+    private Set<ProductStock> stock = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
