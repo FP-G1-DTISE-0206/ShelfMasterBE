@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface GetUserAddressUsecase {
     List<UserAddressResponse> getUserAddress(String email);
+    UserAddressResponse getUserAddressById(Long id,String email);
 }

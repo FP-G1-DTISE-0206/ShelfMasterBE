@@ -59,6 +59,12 @@ public class UserController {
         return ApiResponse.successfulResponse("User address created successfully", createUserAddressUsecase.createUserAddress(req, email));
     }
 
+    @GetMapping("/address/{id}")
+    public ResponseEntity<?> getUserAddressById(@PathVariable Long id) {
+        String email = Claims.getEmailFromJwt();
+        return ApiResponse.successfulResponse("User address retrieved successfully", getUserAddressUsecase.getUserAddressById(id, email));
+    }
+
     @PutMapping("/address/{id}")
     public ResponseEntity<?> updateUserAddress(@PathVariable Long id, @RequestBody @Validated UserAddressRequest req) {
         String email = Claims.getEmailFromJwt();

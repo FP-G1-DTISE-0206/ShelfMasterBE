@@ -26,7 +26,7 @@ public class GetUserAddressUsecaseImpl implements GetUserAddressUsecase {
     @Override
     public List<UserAddressResponse> getUserAddress(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
-        return userAddressRepository.findByUser_Id((user.getId())).stream().map(address ->
+        return userAddressRepository.findByUser_IdOrderByIsDefaultDescIdAsc((user.getId())).stream().map(address ->
                 new UserAddressResponse(
                         address.getId(),
                         address.getUser().getId(),
@@ -42,5 +42,26 @@ public class GetUserAddressUsecaseImpl implements GetUserAddressUsecase {
                         address.getAreaId(),
                         address.getIsDefault()
                 )).toList();
+    }
+
+    @Override
+    public UserAddressResponse getUserAddressById(Long id, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        return userAddressRepository.findByIdAndUser_Id( id, user.getId()).map(
+                address -> new UserAddressResponse(
+                        address.getId(),
+                        address.getUser().getId(),
+                        address.getContactName(),
+                        address.getContactNumber(),
+                        address.getProvince(),
+                        address.getCity(),
+                        address.getDistrict(),
+                        address.getPostalCode(),
+                        address.getAddress(),
+                        address.getLatitude(),
+                        address.getLongitude(),
+                        address.getAreaId(),
+                        address.getIsDefault())
+        ).orElseThrow(() -> new DataNotFoundException("User address not found"));
     }
 }

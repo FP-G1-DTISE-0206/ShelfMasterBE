@@ -16,4 +16,7 @@ public interface UserAddressRepository extends JpaRepository<UserAddress, Long> 
     Optional<UserAddress> findByIdAndUser_Id(Long id, Long userId);
 
     void deleteByIdAndUser_Id(Long id, Long userId);
+
+    List<UserAddress> findByUser_IdOrderByIsDefaultDescIdAsc(Long userId);
+
 }
