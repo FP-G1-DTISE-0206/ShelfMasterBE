@@ -5,4 +5,5 @@ import com.DTISE.ShelfMasterBE.infrastructure.userAddress.dto.UserAddressRespons
 
 public interface UpdateUserAddressUsecase {
      UserAddressResponse updateUserAddress(Long id, UserAddressRequest req, String email);
+     UserAddressResponse setDefaultAddress(Long id, String email);
 }

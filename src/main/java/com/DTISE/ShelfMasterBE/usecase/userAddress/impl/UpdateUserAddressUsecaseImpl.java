@@ -9,6 +9,7 @@ import com.DTISE.ShelfMasterBE.infrastructure.userAddress.dto.UserAddressRespons
 import com.DTISE.ShelfMasterBE.infrastructure.userAddress.repository.UserAddressRepository;
 import com.DTISE.ShelfMasterBE.usecase.userAddress.UpdateUserAddressUsecase;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -39,21 +40,22 @@ public class UpdateUserAddressUsecaseImpl implements UpdateUserAddressUsecase {
             userAddress.setAreaId(req.getAreaId());
             return userAddressRepository.save(userAddress);
         }).map(
-                userAddress -> new UserAddressResponse(
-                        userAddress.getId(),
-                        userAddress.getUser().getId(),
-                        userAddress.getContactName(),
-                        userAddress.getContactNumber(),
-                        userAddress.getProvince(),
-                        userAddress.getCity(),
-                        userAddress.getDistrict(),
-                        userAddress.getPostalCode(),
-                        userAddress.getAddress(),
-                        userAddress.getLatitude(),
-                        userAddress.getLongitude(),
-                        userAddress.getAreaId(),
-                        userAddress.getIsDefault()
-                )
+                UserAddressResponse::new
         ).orElseThrow(() -> new DataNotFoundException("User address not found"));
+    }
+
+    @Override
+    @Transactional
+    public UserAddressResponse setDefaultAddress(Long id, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        UserAddress userAddress = userAddressRepository.findByIdAndUser_Id(id, user.getId())
+                .orElseThrow(() -> new DataNotFoundException("User address not found"));
+        if (userAddress.getIsDefault()) {
+            throw new RuntimeException( "Cannot set default address as it is already set");
+        }
+        userAddressRepository.updateIsDefaultToFalse(user.getId());
+        userAddress.setIsDefault(true);
+        UserAddress savedUserAddress = userAddressRepository.save(userAddress);
+        return new UserAddressResponse(savedUserAddress);
     }
 }

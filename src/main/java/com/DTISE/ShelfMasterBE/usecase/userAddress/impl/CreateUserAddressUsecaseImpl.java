@@ -23,27 +23,16 @@ public class CreateUserAddressUsecaseImpl implements CreateUserAddressUsecase {
 
     @Override
     public UserAddressResponse createUserAddress(UserAddressRequest req,String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            throw new DataNotFoundException("User not found");
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
+        long addressCount= userAddressRepository.countByUser_Id(user.getId());
+        if (addressCount >= 5) {
+            throw new RuntimeException("User already has 5 addresses, cannot add more.");
         }
         UserAddress userAddress = req.toEntity();
-        userAddress.setUser(user.get());
-        userAddressRepository.save(userAddress);
+        userAddress.setUser(user);
+        UserAddress savedUserAddress = userAddressRepository.save(userAddress);
         return new UserAddressResponse(
-                userAddress.getId(),
-                userAddress.getUser().getId(),
-                userAddress.getContactName(),
-                userAddress.getContactNumber(),
-                userAddress.getProvince(),
-                userAddress.getCity(),
-                userAddress.getDistrict(),
-                userAddress.getPostalCode(),
-                userAddress.getAddress(),
-                userAddress.getLatitude(),
-                userAddress.getLongitude(),
-                userAddress.getAreaId(),
-                userAddress.getIsDefault()
+                savedUserAddress
         );
     }
 }

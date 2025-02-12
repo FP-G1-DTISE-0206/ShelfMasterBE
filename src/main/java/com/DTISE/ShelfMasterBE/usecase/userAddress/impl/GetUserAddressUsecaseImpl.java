@@ -26,42 +26,14 @@ public class GetUserAddressUsecaseImpl implements GetUserAddressUsecase {
     @Override
     public List<UserAddressResponse> getUserAddress(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
-        return userAddressRepository.findByUser_IdOrderByIsDefaultDescIdAsc((user.getId())).stream().map(address ->
-                new UserAddressResponse(
-                        address.getId(),
-                        address.getUser().getId(),
-                        address.getContactName(),
-                        address.getContactNumber(),
-                        address.getProvince(),
-                        address.getCity(),
-                        address.getDistrict(),
-                        address.getPostalCode(),
-                        address.getAddress(),
-                        address.getLatitude(),
-                        address.getLongitude(),
-                        address.getAreaId(),
-                        address.getIsDefault()
-                )).toList();
+        return userAddressRepository.findByUser_IdOrderByIsDefaultDescIdAsc((user.getId())).stream().map(UserAddressResponse::new).toList();
     }
 
     @Override
     public UserAddressResponse getUserAddressById(Long id, String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new DataNotFoundException("User not found"));
         return userAddressRepository.findByIdAndUser_Id( id, user.getId()).map(
-                address -> new UserAddressResponse(
-                        address.getId(),
-                        address.getUser().getId(),
-                        address.getContactName(),
-                        address.getContactNumber(),
-                        address.getProvince(),
-                        address.getCity(),
-                        address.getDistrict(),
-                        address.getPostalCode(),
-                        address.getAddress(),
-                        address.getLatitude(),
-                        address.getLongitude(),
-                        address.getAreaId(),
-                        address.getIsDefault())
+                UserAddressResponse::new
         ).orElseThrow(() -> new DataNotFoundException("User address not found"));
     }
 }

@@ -77,4 +77,10 @@ public class UserController {
         deleteUserAddressUsecase.deleteUserAddress(id, email);
         return ApiResponse.successfulResponse("User address deleted successfully");
     }
+
+    @PatchMapping("/address/{id}/set-default")
+    public ResponseEntity<?> setDefaultAddress(@PathVariable Long id) {
+         String email = Claims.getEmailFromJwt();
+         return ApiResponse.successfulResponse("Address set as default successfully", updateUserAddressUsecase.setDefaultAddress(id, email));
+    }
 }
