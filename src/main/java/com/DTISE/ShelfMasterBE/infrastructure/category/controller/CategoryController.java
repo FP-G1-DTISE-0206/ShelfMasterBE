@@ -54,7 +54,7 @@ public class CategoryController {
     }
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id,
                                            @RequestBody UpdateCategoryRequest req) {
         return ApiResponse.successfulResponse(

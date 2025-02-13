@@ -43,7 +43,10 @@ public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
                 .map(existingProduct -> {
                     checkProductNameAvailable(id, req);
                     existingProduct.setName(req.getName());
+                    existingProduct.setSku(req.getSku());
+                    existingProduct.setDescription(req.getDescription());
                     existingProduct.setPrice(req.getPrice());
+                    existingProduct.setWeight(req.getWeight());
                     existingProduct.setUpdatedAt(OffsetDateTime.now());
                     updateCategories(existingProduct, req);
                     updateProductImages(existingProduct, req);

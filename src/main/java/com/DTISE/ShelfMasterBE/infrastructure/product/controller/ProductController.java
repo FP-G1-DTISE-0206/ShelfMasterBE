@@ -77,7 +77,7 @@ public class ProductController {
     }
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id,
                                            @RequestBody UpdateProductRequest req) {
         return ApiResponse.successfulResponse(
