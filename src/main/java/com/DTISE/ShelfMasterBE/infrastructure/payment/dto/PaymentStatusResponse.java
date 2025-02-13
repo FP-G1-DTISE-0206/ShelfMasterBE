@@ -10,4 +10,6 @@ import lombok.NoArgsConstructor;
 public class PaymentStatusResponse {
     private String transactionId;
     private String status;
+    private String amount;
+    private String transactionTime;
 }
