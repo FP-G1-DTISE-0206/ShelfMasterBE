@@ -41,9 +41,9 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getCategories(@RequestParam Integer start,
-                                           @RequestParam Integer length,
-                                           @RequestParam String search) {
+    public ResponseEntity<?> getCategories(@RequestParam(defaultValue = "0") Integer start,
+                                           @RequestParam(defaultValue = "10") Integer length,
+                                           @RequestParam(defaultValue = "") String search) {
         return ApiResponse.successfulResponse(
                 "Categories retrieved successfully",
                 Pagination.mapResponse(

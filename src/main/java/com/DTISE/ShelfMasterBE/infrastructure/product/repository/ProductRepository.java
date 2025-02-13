@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Boolean existsByName(String name);
@@ -16,8 +17,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
         SELECT p FROM Product p LEFT JOIN p.categories c
         WHERE (:search IS NULL OR :search = ''
-        OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
+        AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
         OR LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')))
+        AND (:categoryIds IS NULL OR c.id IN :categoryIds))
     """)
-    Page<Product> findAllBySearch(@Param("search") String search, Pageable pageable);
+    Page<Product> findAllBySearchAndCategoryIds(
+            @Param("search") String search,
+            @Param("categoryIds") List<Long> categoryIds,
+            Pageable pageable
+    );
 }
