@@ -102,7 +102,10 @@ DROP TABLE IF EXISTS "public"."product" CASCADE;
 CREATE TABLE "public"."product" (
                                     "id" BIGSERIAL NOT NULL,
                                     "name" CHARACTER VARYING(255) NOT NULL,
+                                    "sku" CHARACTER VARYING(100) NOT NULL,
+                                    "description" TEXT,
                                     "price" DOUBLE PRECISION NOT NULL DEFAULT 0,
+                                    "weight" DOUBLE PRECISION NOT NULL DEFAULT 0,
                                     "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                     "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                     "deleted_at" TIMESTAMP WITH TIME ZONE,

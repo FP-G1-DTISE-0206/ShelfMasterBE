@@ -40,19 +40,21 @@ public class CategoryController {
                 createCategoryUseCase.createCategory(req));
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getCategories(@RequestParam Integer start,
-                                         @RequestParam Integer length) {
+                                           @RequestParam Integer length,
+                                           @RequestParam String search) {
         return ApiResponse.successfulResponse(
                 "Categories retrieved successfully",
                 Pagination.mapResponse(
-                        getCategoriesUseCase.getCategories(Pagination.createPageable(start, length))
+                        getCategoriesUseCase.getCategories(Pagination.createPageable(start, length),
+                                search)
                 )
         );
     }
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id,
                                            @RequestBody UpdateCategoryRequest req) {
         return ApiResponse.successfulResponse(

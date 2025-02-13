@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Data
@@ -14,5 +15,6 @@ public class GetProductResponse {
     private Long id;
     private String name;
     private BigDecimal price;
-    private List<CategoryResponse> categories;
+    private ProductImageResponse image;
+    private Integer quantity;
 }

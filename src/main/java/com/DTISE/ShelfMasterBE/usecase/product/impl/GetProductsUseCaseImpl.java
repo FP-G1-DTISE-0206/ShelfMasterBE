@@ -1,8 +1,10 @@
 package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.entity.Category;
-import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CategoryResponse;
-import com.DTISE.ShelfMasterBE.infrastructure.product.dto.GetProductResponse;
+import com.DTISE.ShelfMasterBE.entity.ProductImage;
+import com.DTISE.ShelfMasterBE.entity.ProductStock;
+import com.DTISE.ShelfMasterBE.infrastructure.product.dto.*;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.usecase.product.GetProductsUseCase;
 import org.springframework.data.domain.Page;
@@ -28,8 +30,26 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
                         product.getId(),
                         product.getName(),
                         product.getPrice(),
-                        mapProductCategoryResponse(product.getCategories())
+                        getFirstImage(product.getImages()),
+                        sumProductQuantity(product.getStock())
                 ));
+    }
+
+    @Override
+    public GetProductDetailResponse getProductDetail(Long id) {
+        return productRepository.findById(id)
+                .map(product -> new GetProductDetailResponse(
+                        product.getId(),
+                        product.getSku(),
+                        product.getName(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getWeight(),
+                        mapProductCategoryResponse(product.getCategories()),
+                        mapProductImageResponse(product.getImages())
+                ))
+                .orElseThrow(() -> new DataNotFoundException(
+                        "Product not found with id: " + id));
     }
 
     private List<CategoryResponse> mapProductCategoryResponse(
@@ -39,5 +59,29 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
             responses.add(new CategoryResponse(category.getId(), category.getName()));
         }
         return responses;
+    }
+
+    private List<ProductImageResponse> mapProductImageResponse(
+            Set<ProductImage> images) {
+        List<ProductImageResponse> responses = new ArrayList<>();
+        for (ProductImage image : images) {
+            responses.add(new ProductImageResponse(image.getId(), image.getImageUrl()));
+        }
+        return responses;
+    }
+
+    private ProductImageResponse getFirstImage(Set<ProductImage> images) {
+        return images == null || images.isEmpty()
+                ? null
+                : images.stream()
+                .findFirst()
+                .map(image -> new ProductImageResponse(image.getId(), image.getImageUrl()))
+                .orElse(null);
+    }
+
+    private Integer sumProductQuantity(Set<ProductStock> stock) {
+        return stock == null ? 0 : stock.stream()
+                .map(ProductStock::getQuantity)
+                .reduce(0, Integer::sum);
     }
 }
