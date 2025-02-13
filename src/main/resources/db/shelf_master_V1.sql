@@ -37,17 +37,28 @@ CREATE TABLE "public"."role" (
     WITH ( OIDS=FALSE );
 
 -- -----------------------------------
--- "public"."address"
+-- "public"."user_address"
 -- -----------------------------------
 
-DROP TABLE IF EXISTS "public"."address" CASCADE;
-CREATE TABLE "public"."address" (
-                                    "id" BIGSERIAL NOT NULL,
-                                    "location" TEXT,
-                                    "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                    "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                    "deleted_at" TIMESTAMP WITH TIME ZONE,
-                                    PRIMARY KEY ( "id" )
+DROP TABLE IF EXISTS "public"."user_address" CASCADE;
+CREATE TABLE "public"."user_address" (
+                                         "id" BIGSERIAL NOT NULL,
+                                         "user_id" BIGINT NOT NULL,
+                                         "contact_name" CHARACTER VARYING NOT NULL,
+                                         "contact_number" CHARACTER VARYING NOT NULL,
+                                         "area_id" CHARACTER VARYING(255) NOT NULL,
+                                         "province" CHARACTER VARYING(255) NOT NULL,
+                                         "city" CHARACTER VARYING NOT NULL,
+                                         "district" CHARACTER VARYING(255) NOT NULL,
+                                         "postal_code" CHARACTER VARYING NOT NULL,
+                                         "address" TEXT NOT NULL,
+                                         "latitude" DOUBLE PRECISION NOT NULL,
+                                         "longitude" DOUBLE PRECISION NOT NULL,
+                                         "is_default" BOOLEAN NOT NULL DEFAULT false,
+                                         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                         "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                         "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                         PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -64,22 +75,6 @@ CREATE TABLE "public"."user_roles" (
                                        "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                        "deleted_at" TIMESTAMP WITH TIME ZONE,
                                        PRIMARY KEY ( "id" )
-)
-    WITH ( OIDS=FALSE );
-
--- -----------------------------------
--- "public"."user_addresses"
--- -----------------------------------
-
-DROP TABLE IF EXISTS "public"."user_addresses" CASCADE;
-CREATE TABLE "public"."user_addresses" (
-                                           "id" BIGSERIAL NOT NULL,
-                                           "user_id" BIGINT NOT NULL,
-                                           "address_id" BIGINT NOT NULL,
-                                           "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                           "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                           "deleted_at" SERIAL,
-                                           PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -322,20 +317,16 @@ CREATE TABLE "public"."warehouse_admins" (
 -- Foreign Keys
 -- -----------------------------------
 
+ALTER TABLE "public"."user_address"
+    ADD CONSTRAINT "user_address_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
+        ON DELETE NO ACTION ON UPDATE NO ACTION;
+
 ALTER TABLE "public"."user_roles"
     ADD CONSTRAINT "user_roles_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
         ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE "public"."user_roles"
     ADD CONSTRAINT "user_roles_role_id_fkey" FOREIGN KEY ( "role_id" ) REFERENCES "public"."role" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
-
-ALTER TABLE "public"."user_addresses"
-    ADD CONSTRAINT "user_addresses_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
-
-ALTER TABLE "public"."user_addresses"
-    ADD CONSTRAINT "user_addresses_address_id_fkey" FOREIGN KEY ( "address_id" ) REFERENCES "public"."address" ( "id" )
         ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE "public"."product_stock"
