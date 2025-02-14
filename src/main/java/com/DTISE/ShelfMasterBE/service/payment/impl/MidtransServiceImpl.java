@@ -47,8 +47,8 @@ public class MidtransServiceImpl implements MidtransService {
 
             logger.info("Midtrans Response - Transaction ID: {}, Payment URL: {}", request.getOrderId(), paymentUrl);
 
-            return new PaymentResponse(request.getOrderId(), paymentUrl, "Pending");
-
+//            return new PaymentResponse(request.getOrderId(), paymentUrl, "Pending");
+            return new PaymentResponse(request.getOrderId(), transactionToken, "PENDING");
         } catch(MidtransError e){
             logger.error("Midtrans Error: {}", e.getMessage(), e);
             return new PaymentResponse(null,null,"FAILED");
