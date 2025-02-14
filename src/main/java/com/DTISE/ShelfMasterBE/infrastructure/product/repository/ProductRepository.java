@@ -15,11 +15,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> getFirstByName(String name);
 
     @Query("""
-        SELECT p FROM Product p LEFT JOIN p.categories c
+        SELECT p FROM Product p
         WHERE (:search IS NULL OR :search = ''
-        AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
-        OR LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')))
-        AND (:categoryIds IS NULL OR c.id IN :categoryIds))
+        OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
+        AND (:categoryIds IS NULL OR (
+            EXISTS (SELECT 1 FROM p.categories c WHERE c.id IN :categoryIds)
+            AND SIZE(p.categories) > 0
+        ))
     """)
     Page<Product> findAllBySearchAndCategoryIds(
             @Param("search") String search,

@@ -58,7 +58,7 @@ public class ProductController {
             @RequestParam(defaultValue = "id") String field,
             @RequestParam(defaultValue = "asc") String order,
             @RequestParam(defaultValue = "") String search,
-            @RequestParam(defaultValue = "") List<Long> category
+            @RequestParam(required = false) List<Long> category
     ) {
         return ApiResponse.successfulResponse(
                 "Products retrieved successfully",
