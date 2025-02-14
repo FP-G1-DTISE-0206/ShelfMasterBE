@@ -10,8 +10,18 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WarehouseResponse {
+public class WarehouseFullResponse {
     private Long id;
     private String name;
+    private String contactName;
+    private String contactNumber;
+    private String province;
+    private String city;
+    private String district;
+    private String postalCode;
+    private String address;
+    private Double latitude;
+    private Double longitude;
+    private String areaId;
     private List<UserResponse> users;
 }
