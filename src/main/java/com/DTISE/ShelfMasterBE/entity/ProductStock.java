@@ -2,14 +2,11 @@ package com.DTISE.ShelfMasterBE.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.OffsetDateTime;
 
 @Getter

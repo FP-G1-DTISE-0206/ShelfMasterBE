@@ -7,5 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface GetProductsUseCase {
     Page<GetProductResponse> getProducts(Pageable pageable, String search);
+    Page<GetProductResponse> getProductsByWarehouse(Pageable pageable, String search, Long warehouseId);
     GetProductDetailResponse getProductDetail(Long id);
 }

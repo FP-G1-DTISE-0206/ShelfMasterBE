@@ -2,6 +2,7 @@ package com.DTISE.ShelfMasterBE.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,23 +13,19 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_images")
+@Table(name = "vendor")
 @SQLRestriction("deleted_at IS NULL")
-public class ProductImage {
+public class Vendor {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_images_id_gen")
-    @SequenceGenerator(name = "product_images_id_gen",
-            sequenceName = "product_images_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vendor_id_gen")
+    @SequenceGenerator(name = "vendor_id_gen", sequenceName = "vendor_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Size(max = 255)
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
-
-    @NotNull
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -42,7 +39,6 @@ public class ProductImage {
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
-
     @PrePersist
     protected void onCreate() {
         createdAt = OffsetDateTime.now();

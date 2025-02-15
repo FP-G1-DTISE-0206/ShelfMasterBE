@@ -1,9 +1,9 @@
 package com.DTISE.ShelfMasterBE.usecase.product.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
+import com.DTISE.ShelfMasterBE.common.tools.ProductMapper;
 import com.DTISE.ShelfMasterBE.entity.Category;
 import com.DTISE.ShelfMasterBE.entity.ProductImage;
-import com.DTISE.ShelfMasterBE.entity.ProductStock;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.*;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.usecase.product.GetProductsUseCase;
@@ -26,13 +26,13 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
     @Override
     public Page<GetProductResponse> getProducts(Pageable pageable, String search) {
         return productRepository.findAllBySearch(search, pageable)
-                .map(product -> new GetProductResponse(
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        getFirstImage(product.getImages()),
-                        sumProductQuantity(product.getStock())
-                ));
+                .map(ProductMapper::mapGetProductResponse);
+    }
+
+    @Override
+    public Page<GetProductResponse> getProductsByWarehouse(Pageable pageable, String search, Long warehouseId) {
+        return productRepository.findAllBySearch(search, pageable)
+                .map(ProductMapper::mapGetProductResponse);
     }
 
     @Override
@@ -68,20 +68,5 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
             responses.add(new ProductImageResponse(image.getId(), image.getImageUrl()));
         }
         return responses;
-    }
-
-    private ProductImageResponse getFirstImage(Set<ProductImage> images) {
-        return images == null || images.isEmpty()
-                ? null
-                : images.stream()
-                .findFirst()
-                .map(image -> new ProductImageResponse(image.getId(), image.getImageUrl()))
-                .orElse(null);
-    }
-
-    private Integer sumProductQuantity(Set<ProductStock> stock) {
-        return stock == null ? 0 : stock.stream()
-                .map(ProductStock::getQuantity)
-                .reduce(0, Integer::sum);
     }
 }

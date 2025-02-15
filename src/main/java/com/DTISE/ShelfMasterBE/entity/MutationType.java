@@ -1,5 +1,6 @@
 package com.DTISE.ShelfMasterBE.entity;
 
+import com.DTISE.ShelfMasterBE.common.enums.MutationEntityType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -12,23 +13,24 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_images")
+@Table(name = "mutation_type")
 @SQLRestriction("deleted_at IS NULL")
-public class ProductImage {
+public class MutationType {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_images_id_gen")
-    @SequenceGenerator(name = "product_images_id_gen",
-            sequenceName = "product_images_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mutation_type_id_gen")
+    @SequenceGenerator(name = "mutation_type_id_gen", sequenceName = "mutation_type_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @Column(name = "origin_type", nullable = false)
+    private MutationEntityType originType;
 
+    @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+    @Column(name = "destination_type", nullable = false)
+    private MutationEntityType destinationType;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
