@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class WarehouseRequest {
     private Double latitude;
     private Double longitude;
     private String areaId;
+    private List<Long> adminsId;
     public Warehouse toEntity() {
         Warehouse warehouse = new Warehouse();
         warehouse.setName(name);

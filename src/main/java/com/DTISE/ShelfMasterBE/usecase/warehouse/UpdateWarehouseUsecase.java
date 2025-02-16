@@ -1,8 +1,8 @@
 package com.DTISE.ShelfMasterBE.usecase.warehouse;
 
-import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.UpdateWarehouseRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseFullResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseRequest;
 
 public interface UpdateWarehouseUsecase {
-    WarehouseResponse updateWarehouse(UpdateWarehouseRequest req, Long id);
+    WarehouseFullResponse updateWarehouse(WarehouseRequest req, Long id);
 }

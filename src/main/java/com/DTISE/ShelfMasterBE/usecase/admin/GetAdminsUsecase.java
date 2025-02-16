@@ -1,10 +1,10 @@
 package com.DTISE.ShelfMasterBE.usecase.admin;
 
-import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.AdminResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.user.dto.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
 public interface GetAdminsUsecase {
-    Page<AdminResponse> getAdmins(Pageable pageable, String search);
+    Page<UserResponse> getAdmins(Pageable pageable, String search);
 }

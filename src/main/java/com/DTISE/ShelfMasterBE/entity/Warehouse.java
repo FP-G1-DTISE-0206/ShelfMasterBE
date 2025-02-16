@@ -9,6 +9,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,10 +28,6 @@ public class Warehouse {
     @NotNull
     @Column(name = "name", nullable = false)
     private String name;
-
-    @NotNull
-    @Column(name = "location", nullable = false, length = Integer.MAX_VALUE)
-    private String location;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -90,6 +88,10 @@ public class Warehouse {
     @NotNull
     @Column(name = "longitude", nullable = false)
     private Double longitude;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "warehouse_admins", joinColumns = @JoinColumn(name = "warehouse_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> admins = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

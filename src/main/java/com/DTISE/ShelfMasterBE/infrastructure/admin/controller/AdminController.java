@@ -5,6 +5,7 @@ import com.DTISE.ShelfMasterBE.common.tools.Pagination;
 import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.AdminRegisterRequest;
 import com.DTISE.ShelfMasterBE.usecase.admin.CreateAdminUsecase;
+import com.DTISE.ShelfMasterBE.usecase.admin.DeleteAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.GetAdminsUsecase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,10 +25,12 @@ import java.util.Map;
 public class AdminController {
     private final GetAdminsUsecase getAdminsUsecase;
     private final CreateAdminUsecase createAdminUsecase;
+    private final DeleteAdminUsecase deleteAdminUsecase;
 
-    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase) {
+    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase, DeleteAdminUsecase deleteAdminUsecase) {
         this.getAdminsUsecase = getAdminsUsecase;
         this.createAdminUsecase = createAdminUsecase;
+        this.deleteAdminUsecase = deleteAdminUsecase;
     }
 
     @GetMapping()
@@ -49,5 +52,11 @@ public class AdminController {
     public ResponseEntity<?> adminRegister(@RequestBody @Validated AdminRegisterRequest req) {
         var result = createAdminUsecase.createAdmin(req);
         return ApiResponse.successfulResponse("Create new user success", result);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteAdmin(@PathVariable Long id) {
+        deleteAdminUsecase.deleteAdmin(id);
+        return ApiResponse.successfulResponse("Delete admin successfully");
     }
 }

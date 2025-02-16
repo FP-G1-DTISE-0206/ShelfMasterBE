@@ -1,18 +1,13 @@
 package com.DTISE.ShelfMasterBE.usecase.admin.impl;
 
 import com.DTISE.ShelfMasterBE.common.exceptions.DuplicateEmailException;
-import com.DTISE.ShelfMasterBE.common.tools.AdminWarehouseMapper;
-import com.DTISE.ShelfMasterBE.common.tools.UserRoleMapper;
 import com.DTISE.ShelfMasterBE.entity.Role;
 import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.entity.Warehouse;
-import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.AdminResponse;
-import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.RoleResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.AdminRegisterRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.RegisterResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.RoleRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
-import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.user.dto.UserResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.repository.WarehouseRepository;
 import com.DTISE.ShelfMasterBE.usecase.admin.CreateAdminUsecase;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +32,7 @@ public class CreateAdminUsecaseImpl implements CreateAdminUsecase {
     }
 
     @Override
-    public AdminResponse createAdmin(AdminRegisterRequest req) {
+    public UserResponse createAdmin(AdminRegisterRequest req) {
         if (userRepository.findByEmail(req.getEmail()).isPresent()) {
             throw new DuplicateEmailException("Email already exists");
         }
@@ -53,17 +48,11 @@ public class CreateAdminUsecaseImpl implements CreateAdminUsecase {
         }
         newUser.getRoles().add(defaultRole.get());
 
-        Optional<Warehouse> warehouse = warehouseRepository.findById(req.getWarehouseId());
-        if (warehouse.isEmpty()) {
-            throw new RuntimeException("Warehouse not found");
-        }
-        newUser.getWarehouses().add(warehouse.get());
-
         try {
             newUser = userRepository.save(newUser);
         } catch (Exception e) {
             throw new RuntimeException("Can't save user, " + e.getMessage());
         }
-        return new AdminResponse(newUser.getId(), newUser.getEmail(), newUser.getUserName(), newUser.getImageUrl(), UserRoleMapper.mapUserRoleResponse(newUser.getRoles()), AdminWarehouseMapper.mapAdminWarehouseResponse(newUser.getWarehouses()));
+        return new UserResponse(newUser);
     }
 }
