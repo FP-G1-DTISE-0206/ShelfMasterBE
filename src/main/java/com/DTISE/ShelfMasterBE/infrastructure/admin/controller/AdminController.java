@@ -48,6 +48,11 @@ public class AdminController {
         );
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchAdmins(@RequestParam String search) {
+        return ApiResponse.successfulResponse("Admin list retrieved successfully",getAdminsUsecase.getAdminsSearch(search));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> adminRegister(@RequestBody @Validated AdminRegisterRequest req) {
         var result = createAdminUsecase.createAdmin(req);
