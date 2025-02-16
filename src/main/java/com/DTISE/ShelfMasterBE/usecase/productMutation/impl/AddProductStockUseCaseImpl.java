@@ -5,6 +5,7 @@ import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationStatusNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationTypeNotFoundException;
 import com.DTISE.ShelfMasterBE.entity.*;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AddProductStockRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.*;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.AddProductStockUseCase;
@@ -24,19 +25,22 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
     private final ProductMutationRepository productMutationRepository;
     private final ProductMutationLogRepository productMutationLogRepository;
     private final ProductStockRepository productStockRepository;
+    private final UserRepository userRepository;
 
     public AddProductStockUseCaseImpl(
             MutationTypeRepository mutationTypeRepository,
             MutationStatusRepository mutationStatusRepository,
             ProductMutationRepository productMutationRepository,
             ProductMutationLogRepository productMutationLogRepository,
-            ProductStockRepository productStockRepository
+            ProductStockRepository productStockRepository,
+            UserRepository userRepository
     ) {
         this.mutationTypeRepository = mutationTypeRepository;
         this.mutationStatusRepository = mutationStatusRepository;
         this.productMutationRepository = productMutationRepository;
         this.productMutationLogRepository = productMutationLogRepository;
         this.productStockRepository = productStockRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -57,7 +61,7 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
         boolean isAdmin = user.getWarehouses().stream()
                 .anyMatch(w -> Objects.equals(w.getId(), warehouseId));
         if (!isAdmin) {
-            throw new AuthorizationDeniedException("Unauthorized: Not an admin.");
+            throw new AuthorizationDeniedException("Unauthorized: Not an admin of current warehouse.");
         }
     }
 
@@ -69,12 +73,20 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
         ProductMutation mutation = req.toEntity();
         mutation.setMutationTypeId(type.getId());
         mutation.setRequestedBy(user.getId());
+        mutation.setProcessedBy(getSystemId());
+        mutation.setIsApproved(true);
         return mutation;
+    }
+
+    private Long getSystemId() {
+        return userRepository.findByEmail("system@localhost")
+                .orElseThrow(() -> new RuntimeException("Fail to auto mutate: system not found."))
+                .getId();
     }
 
     private void createMutationLog(ProductMutation mutation) {
         MutationStatus status = mutationStatusRepository
-                .findFirstByName(MutationStatusEnum.PENDING)
+                .findFirstByName(MutationStatusEnum.APPROVED)
                 .orElseThrow(() -> new MutationStatusNotFoundException("Status not found."));
 
         ProductMutationLog log = new ProductMutationLog();
