@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -52,18 +53,19 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<?> getProducts(
-            @RequestParam Integer start,
-            @RequestParam Integer length,
-            @RequestParam String field,
-            @RequestParam String order,
-            @RequestParam String search
-    ) {
+            @RequestParam(defaultValue = "0") Integer start,
+            @RequestParam(defaultValue = "10") Integer length,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(required = false) List<Long> category
+            ) {
         return ApiResponse.successfulResponse(
                 "Products retrieved successfully",
                 Pagination.mapResponse(getProductsUseCase
                         .getProducts(
                                 Pagination.createPageable(start, length, field, order),
-                                search))
+                                search, category))
         );
     }
 

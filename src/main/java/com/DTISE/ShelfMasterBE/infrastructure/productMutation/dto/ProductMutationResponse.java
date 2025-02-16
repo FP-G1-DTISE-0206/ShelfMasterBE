@@ -13,7 +13,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetProductMutationResponse {
+public class ProductMutationResponse {
     private Long id;
     private MutationType mutationType;
     private MutationOriginResponse origin;

@@ -138,6 +138,7 @@ CREATE TABLE "public"."product_stock" (
                                           "warehouse_id" BIGINT NOT NULL,
                                           "product_id" BIGINT NOT NULL,
                                           "quantity" BIGINT NOT NULL DEFAULT 0,
+                                          "version" BIGINT NOT NULL DEFAULT 0,
                                           "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                           "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                           "deleted_at" TIMESTAMP WITH TIME ZONE,

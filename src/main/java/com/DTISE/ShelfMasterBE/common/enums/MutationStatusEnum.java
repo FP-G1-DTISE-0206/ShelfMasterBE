@@ -1,6 +1,6 @@
 package com.DTISE.ShelfMasterBE.common.enums;
 
-public enum MutationStatus {
+public enum MutationStatusEnum {
     PENDING,
     APPROVED,
     CANCELED,

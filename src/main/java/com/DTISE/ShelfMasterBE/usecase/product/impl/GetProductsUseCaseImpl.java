@@ -24,14 +24,14 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
     }
 
     @Override
-    public Page<GetProductResponse> getProducts(Pageable pageable, String search) {
-        return productRepository.findAllBySearch(search, pageable)
+    public Page<GetProductResponse> getProducts(Pageable pageable, String search, List<Long> categories) {
+        return productRepository.findAllBySearchAndCategoryIds(search, categories, pageable)
                 .map(ProductMapper::mapGetProductResponse);
     }
 
     @Override
     public Page<GetProductResponse> getProductsByWarehouse(Pageable pageable, String search, Long warehouseId) {
-        return productRepository.findAllBySearch(search, pageable)
+        return productRepository.findAllBySearchAndWarehouseId(search, pageable, warehouseId)
                 .map(ProductMapper::mapGetProductResponse);
     }
 

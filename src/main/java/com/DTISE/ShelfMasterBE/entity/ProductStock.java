@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigInteger;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -33,6 +34,10 @@ public class ProductStock {
     @NotNull
     @Column(name = "quantity")
     private Integer quantity;
+
+    @Version
+    @Column(name = "version")
+    private BigInteger version;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")

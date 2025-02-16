@@ -1,11 +1,11 @@
 package com.DTISE.ShelfMasterBE.usecase.productMutation.impl;
 
-import com.DTISE.ShelfMasterBE.common.enums.MutationStatus;
+import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
 import com.DTISE.ShelfMasterBE.common.tools.ProductMapper;
 import com.DTISE.ShelfMasterBE.common.tools.UserMapper;
 import com.DTISE.ShelfMasterBE.entity.ProductMutation;
 import com.DTISE.ShelfMasterBE.entity.ProductMutationLog;
-import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.GetProductMutationResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.ProductMutationResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.MutationDestinationResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.MutationOriginResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.ProductMutationLogResponse;
@@ -33,22 +33,26 @@ public class GetProductMutationUseCaseImpl implements GetProductMutationUseCase 
     }
 
     @Override
-    public Page<GetProductMutationResponse> getProductMutations(Pageable pageable, Long warehouseId) {
+    public Page<ProductMutationResponse> getProductMutations(Pageable pageable, Long warehouseId) {
         return productMutationRepository.getAllByWarehouseId(pageable, warehouseId)
-                .map(productMutation -> new GetProductMutationResponse(
-                        productMutation.getId(),
-                        productMutation.getMutationType(),
-                        mapMutationOriginResponse(getOriginEntity(productMutation)),
-                        mapMutationDestinationResponse(getDestinationEntity(productMutation)),
-                        ProductMapper.mapGetProductResponse(productMutation.getProduct()),
-                        productMutation.getQuantity(),
-                        UserMapper.mapUserResponse(productMutation.getRequestedByUser()),
-                        (productMutation.getProcessedBy() == null
-                                ? null : UserMapper.mapUserResponse(productMutation.getProcessedByUser())),
-                        productMutation.getIsApproved(),
-                        getLatestProductMutationLog(productMutation.getMutationLogs()),
-                        productMutation.getMutationLogs()
-                ));
+                .map(this::mapProductMutationResponse);
+    }
+    
+    private ProductMutationResponse mapProductMutationResponse(ProductMutation productMutation) {
+        return new ProductMutationResponse(
+                productMutation.getId(),
+                productMutation.getMutationType(),
+                mapMutationOriginResponse(getOriginEntity(productMutation)),
+                mapMutationDestinationResponse(getDestinationEntity(productMutation)),
+                ProductMapper.mapGetProductResponse(productMutation.getProduct()),
+                productMutation.getQuantity(),
+                UserMapper.mapUserResponse(productMutation.getRequestedByUser()),
+                (productMutation.getProcessedBy() == null
+                        ? null : UserMapper.mapUserResponse(productMutation.getProcessedByUser())),
+                productMutation.getIsApproved(),
+                getLatestProductMutationLog(productMutation.getMutationLogs()),
+                productMutation.getMutationLogs()
+        );
     }
 
     private ProductMutationLogResponse getLatestProductMutationLog(Set<ProductMutationLog> logs) {
@@ -57,7 +61,7 @@ public class GetProductMutationUseCaseImpl implements GetProductMutationUseCase 
                 .max(Comparator.comparing(ProductMutationLog::getCreatedAt))
                 .map(productMutationLog -> new ProductMutationLogResponse(
                         productMutationLog.getId(),
-                        MutationStatus.valueOf(productMutationLog.getMutationStatus().getName().toString())
+                        MutationStatusEnum.valueOf(productMutationLog.getMutationStatus().getName().toString())
                 ))
                 .orElse(null);
     }
