@@ -3,7 +3,9 @@ package com.DTISE.ShelfMasterBE.infrastructure.admin.controller;
 import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
 import com.DTISE.ShelfMasterBE.entity.User;
+import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.ChangeAdminPasswordRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.AdminRegisterRequest;
+import com.DTISE.ShelfMasterBE.usecase.admin.ChangeAdminPasswordUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.CreateAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.DeleteAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.GetAdminsUsecase;
@@ -26,11 +28,13 @@ public class AdminController {
     private final GetAdminsUsecase getAdminsUsecase;
     private final CreateAdminUsecase createAdminUsecase;
     private final DeleteAdminUsecase deleteAdminUsecase;
+    private final ChangeAdminPasswordUsecase changeAdminPasswordUsecase;
 
-    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase, DeleteAdminUsecase deleteAdminUsecase) {
+    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase, DeleteAdminUsecase deleteAdminUsecase, ChangeAdminPasswordUsecase changeAdminPasswordUsecase) {
         this.getAdminsUsecase = getAdminsUsecase;
         this.createAdminUsecase = createAdminUsecase;
         this.deleteAdminUsecase = deleteAdminUsecase;
+        this.changeAdminPasswordUsecase = changeAdminPasswordUsecase;
     }
 
     @GetMapping()
@@ -64,4 +68,11 @@ public class AdminController {
         deleteAdminUsecase.deleteAdmin(id);
         return ApiResponse.successfulResponse("Delete admin successfully");
     }
+
+    @PostMapping("/change-password/{id}")
+    public ResponseEntity<?> changeAdminPassword(@PathVariable Long id, @RequestBody ChangeAdminPasswordRequest req) {
+        changeAdminPasswordUsecase.changeAdminPassword(id, req.getPassword());
+        return ApiResponse.successfulResponse("Password changed successfully");
+    }
+
 }
