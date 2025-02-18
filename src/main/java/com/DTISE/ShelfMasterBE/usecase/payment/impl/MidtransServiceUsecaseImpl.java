@@ -1,9 +1,12 @@
-package com.DTISE.ShelfMasterBE.service.payment.impl;
+package com.DTISE.ShelfMasterBE.usecase.payment.impl;
 
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartItemRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentStatusResponse;
-import com.DTISE.ShelfMasterBE.service.payment.MidtransService;
+import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
+import com.DTISE.ShelfMasterBE.usecase.payment.MidtransServiceUsecase;
+import com.DTISE.ShelfMasterBE.entity.Product;
 import com.midtrans.Config;
 import com.midtrans.httpclient.SnapApi;
 import com.midtrans.httpclient.TransactionApi;
@@ -15,17 +18,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class MidtransServiceImpl implements MidtransService {
+public class MidtransServiceUsecaseImpl implements MidtransServiceUsecase {
 
-    private static final Logger logger = LoggerFactory.getLogger(MidtransServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MidtransServiceUsecaseImpl.class);
 
     @Qualifier("midtransConfigBean")
     private final Config midtransConfig;
+    private final ProductRepository productRepository;
 
     @Override
     public PaymentResponse createTransaction(PaymentRequest request){
@@ -38,20 +44,49 @@ public class MidtransServiceImpl implements MidtransService {
 
             params.put("transaction_details", transactionDetails);
 
+            // Ensure cartItems is not null or empty before proceeding
+            if (request.getCartItems() == null || request.getCartItems().isEmpty()) {
+                throw new IllegalArgumentException("Cart items cannot be null or empty");
+            }
+
+
+            // Calculate total amount
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (CartItemRequest itemRequest : request.getCartItems()) {
+                Product product = productRepository.findById(itemRequest.getProductId())
+                        .orElseThrow(() -> new RuntimeException("Product not found with ID: " + itemRequest.getProductId()));
+                totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
+            }
+
+
             logger.info("Requesting Midtrans Transaction for Order ID: {}", request.getOrderId());
 
             JSONObject response = SnapApi.createTransaction(params, midtransConfig);
 
-            String transactionToken = response.getString("token");
-            String paymentUrl = response.getString("redirect_url");
+//            String transactionToken = response.getString("token");
+//            String paymentUrl = response.getString("redirect_url");
+
+            String transactionToken = response.optString("token", null);
+//            String paymentUrl = response.optString("redirect_url", null);
+            String paymentUrl = "https://app.sandbox.midtrans.com/snap/v2/v2.js?token=" + transactionToken;
+
+
+            if(transactionToken == null) {
+                logger.error("Missing expected fields in Midtrans response for order ID: {}", request.getOrderId());
+                return new PaymentResponse(null,null,"FAILED",null);
+            }
 
             logger.info("Midtrans Response - Transaction ID: {}, Payment URL: {}", request.getOrderId(), paymentUrl);
 
+            //            paymentResponse.setTotalAmount(totalAmount);
 //            return new PaymentResponse(request.getOrderId(), paymentUrl, "Pending");
-            return new PaymentResponse(request.getOrderId(), transactionToken, "PENDING");
+            return new PaymentResponse(request.getOrderId(), paymentUrl, "PENDING", totalAmount);
         } catch(MidtransError e){
             logger.error("Midtrans Error: {}", e.getMessage(), e);
-            return new PaymentResponse(null,null,"FAILED");
+            return new PaymentResponse(null,null,"FAILED",null);
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid request: {}", e.getMessage());
+            return new PaymentResponse(null, null, "FAILED", null);
         }
     }
 
