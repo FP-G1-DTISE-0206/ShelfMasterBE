@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleResponse {
-    private Long id;
-    private String name;
+public class ChangeAdminPasswordRequest {
+    private String password;
 }

@@ -3,8 +3,11 @@ package com.DTISE.ShelfMasterBE.infrastructure.admin.controller;
 import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
 import com.DTISE.ShelfMasterBE.entity.User;
+import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.ChangeAdminPasswordRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.AdminRegisterRequest;
+import com.DTISE.ShelfMasterBE.usecase.admin.ChangeAdminPasswordUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.CreateAdminUsecase;
+import com.DTISE.ShelfMasterBE.usecase.admin.DeleteAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.GetAdminsUsecase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,10 +27,14 @@ import java.util.Map;
 public class AdminController {
     private final GetAdminsUsecase getAdminsUsecase;
     private final CreateAdminUsecase createAdminUsecase;
+    private final DeleteAdminUsecase deleteAdminUsecase;
+    private final ChangeAdminPasswordUsecase changeAdminPasswordUsecase;
 
-    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase) {
+    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase, DeleteAdminUsecase deleteAdminUsecase, ChangeAdminPasswordUsecase changeAdminPasswordUsecase) {
         this.getAdminsUsecase = getAdminsUsecase;
         this.createAdminUsecase = createAdminUsecase;
+        this.deleteAdminUsecase = deleteAdminUsecase;
+        this.changeAdminPasswordUsecase = changeAdminPasswordUsecase;
     }
 
     @GetMapping()
@@ -45,9 +52,27 @@ public class AdminController {
         );
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchAdmins(@RequestParam String search) {
+        return ApiResponse.successfulResponse("Admin list retrieved successfully",getAdminsUsecase.getAdminsSearch(search));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> adminRegister(@RequestBody @Validated AdminRegisterRequest req) {
         var result = createAdminUsecase.createAdmin(req);
         return ApiResponse.successfulResponse("Create new user success", result);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteAdmin(@PathVariable Long id) {
+        deleteAdminUsecase.deleteAdmin(id);
+        return ApiResponse.successfulResponse("Delete admin successfully");
+    }
+
+    @PostMapping("/change-password/{id}")
+    public ResponseEntity<?> changeAdminPassword(@PathVariable Long id, @RequestBody ChangeAdminPasswordRequest req) {
+        changeAdminPasswordUsecase.changeAdminPassword(id, req.getPassword());
+        return ApiResponse.successfulResponse("Password changed successfully");
+    }
+
 }

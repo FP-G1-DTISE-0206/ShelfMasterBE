@@ -2,8 +2,7 @@ package com.DTISE.ShelfMasterBE.infrastructure.warehouse.controller;
 
 import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
-import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.CreateWarehouseRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.UpdateWarehouseRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseRequest;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.CreateWarehouseUsecase;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.DeleteWarehouseUsecase;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.UpdateWarehouseUsecase;
@@ -43,15 +42,20 @@ public class WarehouseController {
         );
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getWarehouse(@PathVariable Long id) {
+        return ApiResponse.successfulResponse("Warehouse retrieved successfully", getWarehousesUsecase.getWarehouse(id));
+    }
+
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PostMapping("")
-    public ResponseEntity<?> createWarehouse(@RequestBody @Validated CreateWarehouseRequest req) {
+    public ResponseEntity<?> createWarehouse(@RequestBody @Validated WarehouseRequest req) {
         return ApiResponse.successfulResponse("Warehouse created successfully", createWarehouseUsecase.createWarehouse(req));
     }
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateWarehouse(@RequestBody @Validated UpdateWarehouseRequest req, @PathVariable Long id) {
+    public ResponseEntity<?> updateWarehouse(@RequestBody @Validated WarehouseRequest req, @PathVariable Long id) {
         return ApiResponse.successfulResponse("Warehouse updated successfully", updateWarehouseUsecase.updateWarehouse(req, id));
     }
 
