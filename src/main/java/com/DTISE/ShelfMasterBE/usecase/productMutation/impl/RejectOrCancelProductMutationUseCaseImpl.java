@@ -1,18 +1,20 @@
 package com.DTISE.ShelfMasterBE.usecase.productMutation.impl;
 
 import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationStatusNotFoundException;
+import com.DTISE.ShelfMasterBE.common.tools.PermissionUtils;
 import com.DTISE.ShelfMasterBE.entity.*;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.MutationStatusRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.ProductMutationLogRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.ProductMutationRepository;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.RejectOrCancelProductMutationUseCase;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -20,23 +22,29 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
     private final MutationStatusRepository mutationStatusRepository;
     private final ProductMutationRepository productMutationRepository;
     private final ProductMutationLogRepository productMutationLogRepository;
+    private final UserRepository userRepository;
 
     public RejectOrCancelProductMutationUseCaseImpl(
             MutationStatusRepository mutationStatusRepository,
             ProductMutationRepository productMutationRepository,
-            ProductMutationLogRepository productMutationLogRepository
+            ProductMutationLogRepository productMutationLogRepository,
+            UserRepository userRepository
     ) {
         this.mutationStatusRepository = mutationStatusRepository;
         this.productMutationRepository = productMutationRepository;
         this.productMutationLogRepository = productMutationLogRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     @Transactional
-    public Long cancelProductMutation(User user, Long productMutationId) {
+    public Long cancelProductMutation(Long productMutationId) {
         Optional<ProductMutation> existingMutation = productMutationRepository.findById(productMutationId);
         if(existingMutation.isEmpty()) throw new RuntimeException("No product mutation with ID: " + productMutationId);
         ProductMutation mutationToCancel = existingMutation.get();
+
+        User user = userRepository.findById(Claims.getUserIdFromJwt())
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
         validateUserAccess(user, mutationToCancel.getDestinationId());
 
         process(user, mutationToCancel, "cancel");
@@ -48,10 +56,13 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
 
     @Override
     @Transactional
-    public Long rejectProductMutation(User user, Long productMutationId) {
+    public Long rejectProductMutation(Long productMutationId) {
         Optional<ProductMutation> existingMutation = productMutationRepository.findById(productMutationId);
         if(existingMutation.isEmpty()) throw new RuntimeException("No product mutation with ID: " + productMutationId);
         ProductMutation mutationToReject = existingMutation.get();
+
+        User user = userRepository.findById(Claims.getUserIdFromJwt())
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
         validateUserAccess(user, mutationToReject.getDestinationId());
 
         process(user, mutationToReject, "reject");
@@ -74,12 +85,8 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
     }
 
     private void validateUserAccess(User user, Long warehouseId) {
-        if (user.getWarehouses().isEmpty()) return;
-        boolean isAdmin = user.getWarehouses().stream()
-                .anyMatch(w -> Objects.equals(w.getId(), warehouseId));
-        if (!isAdmin) {
-            throw new AuthorizationDeniedException("Unauthorized: Not an admin of current warehouse.");
-        }
+        if (PermissionUtils.isSuperAdmin(user)) return;
+        PermissionUtils.isAdminOfCurrentWarehouse(user, warehouseId);
     }
 
     private void createMutationLog(ProductMutation mutation, MutationStatusEnum statusEnum) {
@@ -89,7 +96,7 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
 
         ProductMutationLog log = new ProductMutationLog();
         log.setProductMutationId(mutation.getId());
-        log.setMutationStatusId(status.getId());
+        log.setMutationStatus(status);
         productMutationLogRepository.save(log);
     }
 }

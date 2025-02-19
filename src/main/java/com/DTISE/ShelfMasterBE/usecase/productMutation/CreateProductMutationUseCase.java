@@ -4,5 +4,5 @@ import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.InternalProductMutationRequest;
 
 public interface CreateProductMutationUseCase {
-    Long createInternalProductMutation(User user, InternalProductMutationRequest req);
+    Long createInternalProductMutation(InternalProductMutationRequest req);
 }

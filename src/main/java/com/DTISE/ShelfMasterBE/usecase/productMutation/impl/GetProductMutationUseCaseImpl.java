@@ -1,10 +1,16 @@
 package com.DTISE.ShelfMasterBE.usecase.productMutation.impl;
 
+import com.DTISE.ShelfMasterBE.common.enums.MutationEntityType;
 import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
+import com.DTISE.ShelfMasterBE.common.tools.PermissionUtils;
 import com.DTISE.ShelfMasterBE.common.tools.ProductMapper;
 import com.DTISE.ShelfMasterBE.common.tools.UserMapper;
 import com.DTISE.ShelfMasterBE.entity.ProductMutation;
 import com.DTISE.ShelfMasterBE.entity.ProductMutationLog;
+import com.DTISE.ShelfMasterBE.entity.User;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.ProductMutationResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.MutationDestinationResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.MutationOriginResponse;
@@ -27,27 +33,44 @@ public class GetProductMutationUseCaseImpl implements GetProductMutationUseCase 
     private EntityManager entityManager;
 
     private final ProductMutationRepository productMutationRepository;
+    private final UserRepository userRepository;
 
-    public GetProductMutationUseCaseImpl(ProductMutationRepository productMutationRepository) {
+    public GetProductMutationUseCaseImpl(
+            ProductMutationRepository productMutationRepository,
+            UserRepository userRepository
+    ) {
         this.productMutationRepository = productMutationRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Page<ProductMutationResponse> getProductMutations(Pageable pageable, Long warehouseId) {
-        return productMutationRepository.getAllByWarehouseId(pageable, warehouseId)
+    public Page<ProductMutationResponse> getProductMutations(Pageable pageable, String search, Long warehouseId) {
+        validateUserAccess(warehouseId);
+        return productMutationRepository.getAllBySearchAndWarehouseId(
+                        search, pageable, warehouseId,
+                        MutationEntityType.WAREHOUSE)
                 .map(this::mapProductMutationResponse);
+    }
+
+    private void validateUserAccess(Long warehouseId) {
+        if(warehouseId == null) return;
+        User user = userRepository.findById(Claims.getUserIdFromJwt())
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+        if (PermissionUtils.isSuperAdmin(user)) return;
+        PermissionUtils.isAdminOfCurrentWarehouse(user, warehouseId);
     }
     
     private ProductMutationResponse mapProductMutationResponse(ProductMutation productMutation) {
         return new ProductMutationResponse(
                 productMutation.getId(),
-                productMutation.getMutationType(),
+                productMutation.getMutationType().getOriginType(),
+                productMutation.getMutationType().getDestinationType(),
                 mapMutationOriginResponse(getOriginEntity(productMutation)),
                 mapMutationDestinationResponse(getDestinationEntity(productMutation)),
                 ProductMapper.mapGetProductResponse(productMutation.getProduct()),
                 productMutation.getQuantity(),
                 UserMapper.mapUserResponse(productMutation.getRequestedByUser()),
-                (productMutation.getProcessedBy() == null
+                (productMutation.getProcessedByUser() == null
                         ? null : UserMapper.mapUserResponse(productMutation.getProcessedByUser())),
                 productMutation.getIsApproved(),
                 getLatestProductMutationLog(productMutation.getMutationLogs()),

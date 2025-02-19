@@ -1,5 +1,6 @@
 package com.DTISE.ShelfMasterBE.entity;
 
+import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class MutationStatus {
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "name", nullable = false)
-    private MutationStatus name;
+    private MutationStatusEnum name;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")

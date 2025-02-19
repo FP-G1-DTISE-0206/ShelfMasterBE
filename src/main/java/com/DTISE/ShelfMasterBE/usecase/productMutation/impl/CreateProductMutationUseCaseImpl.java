@@ -2,38 +2,48 @@ package com.DTISE.ShelfMasterBE.usecase.productMutation.impl;
 
 import com.DTISE.ShelfMasterBE.common.enums.MutationEntityType;
 import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationStatusNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationTypeNotFoundException;
+import com.DTISE.ShelfMasterBE.common.tools.PermissionUtils;
 import com.DTISE.ShelfMasterBE.entity.*;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.InternalProductMutationRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.*;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.CreateProductMutationUseCase;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 public class CreateProductMutationUseCaseImpl implements CreateProductMutationUseCase {
     private final MutationTypeRepository mutationTypeRepository;
     private final MutationStatusRepository mutationStatusRepository;
     private final ProductMutationRepository productMutationRepository;
     private final ProductMutationLogRepository productMutationLogRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     public CreateProductMutationUseCaseImpl(
             MutationTypeRepository mutationTypeRepository,
             MutationStatusRepository mutationStatusRepository,
             ProductMutationRepository productMutationRepository,
-            ProductMutationLogRepository productMutationLogRepository
+            ProductMutationLogRepository productMutationLogRepository,
+            ProductRepository productRepository,
+            UserRepository userRepository
     ) {
         this.mutationTypeRepository = mutationTypeRepository;
         this.mutationStatusRepository = mutationStatusRepository;
         this.productMutationRepository = productMutationRepository;
         this.productMutationLogRepository = productMutationLogRepository;
+        this.productRepository = productRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     @Transactional
-    public Long createInternalProductMutation(User user, InternalProductMutationRequest req) {
+    public Long createInternalProductMutation(InternalProductMutationRequest req) {
+        User user = userRepository.findById(Claims.getUserIdFromJwt())
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
         validateUserAccess(user, req.getWarehouseOriginId());
 
         ProductMutation newProductMutation = createMutation(user, req);
@@ -45,12 +55,8 @@ public class CreateProductMutationUseCaseImpl implements CreateProductMutationUs
     }
 
     private void validateUserAccess(User user, Long warehouseId) {
-        if (user.getWarehouses().isEmpty()) return;
-        boolean isAdmin = user.getWarehouses().stream()
-                .anyMatch(w -> Objects.equals(w.getId(), warehouseId));
-        if (!isAdmin) {
-            throw new AuthorizationDeniedException("Unauthorized: Not an admin of current warehouse.");
-        }
+        if (PermissionUtils.isSuperAdmin(user)) return;
+        PermissionUtils.isAdminOfCurrentWarehouse(user, warehouseId);
     }
 
     private ProductMutation createMutation(User user, InternalProductMutationRequest req) {
@@ -59,9 +65,15 @@ public class CreateProductMutationUseCaseImpl implements CreateProductMutationUs
                 .orElseThrow(() -> new MutationTypeNotFoundException("Mutation type missing."));
 
         ProductMutation mutation = req.toEntity();
-        mutation.setMutationTypeId(type.getId());
-        mutation.setRequestedBy(user.getId());
+        mutation.setProduct(getProductById(req.getProductId()));
+        mutation.setMutationType(type);
+        mutation.setRequestedByUser(user);
         return mutation;
+    }
+
+    private Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No product with ID: " + id));
     }
 
     private void createMutationLog(ProductMutation mutation) {
@@ -71,7 +83,7 @@ public class CreateProductMutationUseCaseImpl implements CreateProductMutationUs
 
         ProductMutationLog log = new ProductMutationLog();
         log.setProductMutationId(mutation.getId());
-        log.setMutationStatusId(status.getId());
+        log.setMutationStatus(status);
         productMutationLogRepository.save(log);
     }
 }

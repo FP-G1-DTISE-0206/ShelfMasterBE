@@ -12,11 +12,10 @@ public class InternalProductMutationRequest {
     private Long productId;
     private Long warehouseOriginId;
     private Long warehouseDestinationId;
-    private Integer quantity;
+    private Long quantity;
 
     public ProductMutation toEntity() {
         ProductMutation mutation = new ProductMutation();
-        mutation.setProductId(productId);
         mutation.setOriginId(warehouseOriginId);
         mutation.setDestinationId(warehouseDestinationId);
         mutation.setQuantity(quantity);

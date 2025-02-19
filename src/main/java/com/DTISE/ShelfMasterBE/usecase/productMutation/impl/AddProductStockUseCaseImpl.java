@@ -2,20 +2,22 @@ package com.DTISE.ShelfMasterBE.usecase.productMutation.impl;
 
 import com.DTISE.ShelfMasterBE.common.enums.MutationEntityType;
 import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationStatusNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationTypeNotFoundException;
+import com.DTISE.ShelfMasterBE.common.tools.PermissionUtils;
 import com.DTISE.ShelfMasterBE.entity.*;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AddProductStockRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.*;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.AddProductStockUseCase;
 import jakarta.persistence.OptimisticLockException;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,6 +28,7 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
     private final ProductMutationLogRepository productMutationLogRepository;
     private final ProductStockRepository productStockRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     public AddProductStockUseCaseImpl(
             MutationTypeRepository mutationTypeRepository,
@@ -33,7 +36,8 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
             ProductMutationRepository productMutationRepository,
             ProductMutationLogRepository productMutationLogRepository,
             ProductStockRepository productStockRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ProductRepository productRepository
     ) {
         this.mutationTypeRepository = mutationTypeRepository;
         this.mutationStatusRepository = mutationStatusRepository;
@@ -41,11 +45,14 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
         this.productMutationLogRepository = productMutationLogRepository;
         this.productStockRepository = productStockRepository;
         this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
     @Transactional
-    public Long addProductStock(User user, AddProductStockRequest req) {
+    public Long addProductStock(AddProductStockRequest req) {
+        User user = userRepository.findById(Claims.getUserIdFromJwt())
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
         validateUserAccess(user, req.getWarehouseId());
 
         ProductMutation newProductMutation = createMutation(user, req);
@@ -57,12 +64,8 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
     }
 
     private void validateUserAccess(User user, Long warehouseId) {
-        if (user.getWarehouses().isEmpty()) return;
-        boolean isAdmin = user.getWarehouses().stream()
-                .anyMatch(w -> Objects.equals(w.getId(), warehouseId));
-        if (!isAdmin) {
-            throw new AuthorizationDeniedException("Unauthorized: Not an admin of current warehouse.");
-        }
+        if (PermissionUtils.isSuperAdmin(user)) return;
+        PermissionUtils.isAdminOfCurrentWarehouse(user, warehouseId);
     }
 
     private ProductMutation createMutation(User user, AddProductStockRequest req) {
@@ -71,17 +74,22 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
                 .orElseThrow(() -> new MutationTypeNotFoundException("Mutation type missing."));
 
         ProductMutation mutation = req.toEntity();
-        mutation.setMutationTypeId(type.getId());
-        mutation.setRequestedBy(user.getId());
-        mutation.setProcessedBy(getSystemId());
+        mutation.setProduct(getProductById(req.getProductId()));
+        mutation.setMutationType(type);
+        mutation.setRequestedByUser(user);
+        mutation.setProcessedByUser(getSystem());
         mutation.setIsApproved(true);
         return mutation;
     }
 
-    private Long getSystemId() {
+    private Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No product with ID: " + id));
+    }
+
+    private User getSystem() {
         return userRepository.findByEmail("system@localhost")
-                .orElseThrow(() -> new RuntimeException("Fail to auto mutate: system not found."))
-                .getId();
+                .orElseThrow(() -> new RuntimeException("Fail to auto mutate: system not found."));
     }
 
     private void createMutationLog(ProductMutation mutation) {
@@ -91,7 +99,7 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
 
         ProductMutationLog log = new ProductMutationLog();
         log.setProductMutationId(mutation.getId());
-        log.setMutationStatusId(status.getId());
+        log.setMutationStatus(status);
         productMutationLogRepository.save(log);
     }
 
@@ -111,10 +119,11 @@ public class AddProductStockUseCaseImpl implements AddProductStockUseCase {
         newStock.setProductId(req.getProductId());
         newStock.setWarehouseId(req.getWarehouseId());
         newStock.setQuantity(req.getQuantity());
+        newStock.setVersion(0L);
         return productStockRepository.save(newStock).getId();
     }
 
-    private Long updateExistingStock(ProductStock stock, int quantity) {
+    private Long updateExistingStock(ProductStock stock, Long quantity) {
         stock.setQuantity(stock.getQuantity() + quantity);
         stock.setUpdatedAt(OffsetDateTime.now());
         return productStockRepository.save(stock).getId();

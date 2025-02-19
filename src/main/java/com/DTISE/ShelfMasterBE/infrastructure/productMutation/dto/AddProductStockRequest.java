@@ -12,11 +12,10 @@ public class AddProductStockRequest {
     private Long productId;
     private Long warehouseId;
     private Long vendorId;
-    private Integer quantity;
+    private Long quantity;
 
     public ProductMutation toEntity() {
         ProductMutation mutation = new ProductMutation();
-        mutation.setProductId(productId);
         mutation.setOriginId(vendorId);
         mutation.setDestinationId(warehouseId);
         mutation.setQuantity(quantity);

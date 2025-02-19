@@ -28,9 +28,9 @@ public class ProductMapper {
                 .orElse(null);
     }
 
-    private static Integer sumProductQuantity(Set<ProductStock> stock) {
-        return stock == null ? 0 : stock.stream()
+    private static Long sumProductQuantity(Set<ProductStock> stock) {
+        return stock == null ? 0L : stock.stream()
                 .map(ProductStock::getQuantity)
-                .reduce(0, Integer::sum);
+                .reduce(0L, Long::sum);
     }
 }

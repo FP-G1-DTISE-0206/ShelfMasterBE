@@ -33,11 +33,12 @@ public class ProductStock {
 
     @NotNull
     @Column(name = "quantity")
-    private Integer quantity;
+    private Long quantity;
 
+    @NotNull
     @Version
-    @Column(name = "version")
-    private BigInteger version;
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")

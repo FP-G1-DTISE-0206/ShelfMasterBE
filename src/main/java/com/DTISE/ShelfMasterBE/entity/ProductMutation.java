@@ -25,8 +25,9 @@ public class ProductMutation {
     private Long id;
 
     @NotNull
-    @Column(name = "mutation_type_id", nullable = false)
-    private Long mutationTypeId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "mutation_type_id", nullable = false)
+    private MutationType mutationType;
 
     @NotNull
     @Column(name = "origin_id", nullable = false)
@@ -37,62 +38,32 @@ public class ProductMutation {
     private Long destinationId;
 
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull
     @Column(name = "quantity")
-    private Integer quantity;
+    private Long quantity;
 
     @NotNull
-    @Column(name = "requested_by", nullable = false)
-    private Long requestedBy;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "requested_by", nullable = false)
+    private User requestedByUser;
 
     @NotNull
-    @Column(name = "processed_by")
-    private Long processedBy;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "processed_by")
+    private User processedByUser;
 
     @NotNull
     @ColumnDefault("false")
     @Column(name = "is_approved", nullable = false)
     private Boolean isApproved = false;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "mutation_type_id")
-    private MutationType mutationType;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
-    private Product product;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "requested_by", referencedColumnName = "id")
-    private User requestedByUser;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "processed_by", referencedColumnName = "id")
-    private User processedByUser;
-
     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "product_mutation_id")
     private Set<ProductMutationLog> mutationLogs = new HashSet<>();
-
-    public Class<?> getOriginEntityType() {
-        return getEntityType(mutationType.getOriginType());
-    }
-
-    public Class<?> getDestinationEntityType() {
-        return getEntityType(mutationType.getDestinationType());
-    }
-
-    private Class<?> getEntityType(MutationEntityType type) {
-        return switch (type) {
-            case MutationEntityType.USER -> User.class;
-            case MutationEntityType.VENDOR -> Vendor.class;
-            case MutationEntityType.WAREHOUSE -> Warehouse.class;
-            default -> null;
-        };
-    }
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -121,5 +92,22 @@ public class ProductMutation {
     @PreRemove
     protected void onRemove() {
         deletedAt = OffsetDateTime.now();
+    }
+
+    public Class<?> getOriginEntityType() {
+        return getEntityType(mutationType.getOriginType());
+    }
+
+    public Class<?> getDestinationEntityType() {
+        return getEntityType(mutationType.getDestinationType());
+    }
+
+    private Class<?> getEntityType(MutationEntityType type) {
+        return switch (type) {
+            case USER -> User.class;
+            case VENDOR -> Vendor.class;
+            case WAREHOUSE -> Warehouse.class;
+            default -> null;
+        };
     }
 }

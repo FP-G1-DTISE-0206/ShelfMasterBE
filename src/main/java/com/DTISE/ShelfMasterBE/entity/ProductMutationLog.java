@@ -26,11 +26,8 @@ public class ProductMutationLog {
     private Long productMutationId;
 
     @NotNull
-    @Column(name = "mutation_status_id", nullable = false)
-    private Long mutationStatusId;
-
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "mutation_status_id", referencedColumnName = "id")
+    @JoinColumn(name = "mutation_status_id", referencedColumnName = "id", nullable = false)
     private MutationStatus mutationStatus;
 
     @NotNull
