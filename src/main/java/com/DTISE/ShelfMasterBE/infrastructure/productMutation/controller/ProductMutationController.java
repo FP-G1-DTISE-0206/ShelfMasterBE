@@ -4,10 +4,7 @@ import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AddProductStockRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.InternalProductMutationRequest;
-import com.DTISE.ShelfMasterBE.usecase.productMutation.AddProductStockUseCase;
-import com.DTISE.ShelfMasterBE.usecase.productMutation.CreateProductMutationUseCase;
-import com.DTISE.ShelfMasterBE.usecase.productMutation.GetProductMutationUseCase;
-import com.DTISE.ShelfMasterBE.usecase.productMutation.RejectOrCancelProductMutationUseCase;
+import com.DTISE.ShelfMasterBE.usecase.productMutation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -21,17 +18,20 @@ public class ProductMutationController {
     private final GetProductMutationUseCase getProductMutationUseCase;
     private final CreateProductMutationUseCase createProductMutationUseCase;
     private final RejectOrCancelProductMutationUseCase rejectOrCancelProductMutationUseCase;
+    private final ApproveProductMutationUseCase approveProductMutationUseCase;
 
     public ProductMutationController(
             AddProductStockUseCase addProductStockUseCase,
             GetProductMutationUseCase getProductMutationUseCase,
             CreateProductMutationUseCase createProductMutationUseCase,
-            RejectOrCancelProductMutationUseCase rejectOrCancelProductMutationUseCase
+            RejectOrCancelProductMutationUseCase rejectOrCancelProductMutationUseCase,
+            ApproveProductMutationUseCase approveProductMutationUseCase
     ) {
         this.addProductStockUseCase = addProductStockUseCase;
         this.getProductMutationUseCase = getProductMutationUseCase;
         this.createProductMutationUseCase = createProductMutationUseCase;
         this.rejectOrCancelProductMutationUseCase = rejectOrCancelProductMutationUseCase;
+        this.approveProductMutationUseCase = approveProductMutationUseCase;
     }
 
     @PostMapping("/add-stock")
@@ -69,7 +69,7 @@ public class ProductMutationController {
         );
     }
 
-    @PostMapping("cancel/{id}")
+    @PutMapping("cancel/{id}")
     public ResponseEntity<?> cancelMutation(@PathVariable Long id) {
         return ApiResponse.successfulResponse(
                 "Internal mutation canceled successfully",
@@ -77,11 +77,19 @@ public class ProductMutationController {
         );
     }
 
-    @PostMapping("reject/{id}")
+    @PutMapping("reject/{id}")
     public ResponseEntity<?> rejectMutation(@PathVariable Long id) {
         return ApiResponse.successfulResponse(
                 "Internal mutation rejected successfully",
                 rejectOrCancelProductMutationUseCase.rejectProductMutation(id)
+        );
+    }
+
+    @PutMapping("approve/{id}")
+    public ResponseEntity<?> approveMutation(@PathVariable Long id) {
+        return ApiResponse.successfulResponse(
+                "Internal mutation approved successfully",
+                approveProductMutationUseCase.approveProductMutation(id)
         );
     }
 }

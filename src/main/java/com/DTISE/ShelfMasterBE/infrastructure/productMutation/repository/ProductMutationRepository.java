@@ -33,10 +33,9 @@ public interface ProductMutationRepository extends JpaRepository<ProductMutation
               OR LOWER(pm.product.name) LIKE LOWER(CONCAT('%', :search, '%')))
        AND EXISTS (
            SELECT 1 FROM MutationType mt
-           WHERE (mt.originType = :warehouse OR mt.destinationType = :warehouse)
-           AND mt = pm.mutationType
-       )
-       AND (pm.originId = :warehouseId OR pm.destinationId = :warehouseId)
+           WHERE (mt = pm.mutationType)
+           AND((mt.originType = :warehouse AND pm.originId = :warehouseId)
+           OR (pm.destinationId = :warehouseId AND mt.destinationType = :warehouse)))
     """)
     Page<ProductMutationResponse> getAllBySearchAndWarehouseId(
             @Param("search") String search,
