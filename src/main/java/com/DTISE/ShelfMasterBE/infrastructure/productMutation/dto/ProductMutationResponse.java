@@ -10,6 +10,7 @@ public record ProductMutationResponse (
     Long destinationId,
     Long productId,
     String productName,
+    Long quantity,
     Long requesterId,
     String requesterName,
     Long processorId,

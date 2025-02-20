@@ -18,4 +18,12 @@ public class PermissionUtils {
             throw new AuthorizationDeniedException("Unauthorized: Not an admin of current warehouse.");
         }
     }
+
+    public static void isAdminOfCurrentWarehouse(User user, Long warehouseId, Long warehouseId2) {
+        boolean isAdmin = user.getWarehouses().stream()
+                .anyMatch(w -> Objects.equals(w.getId(), warehouseId) || Objects.equals(w.getId(), warehouseId2));
+        if (!isAdmin) {
+            throw new AuthorizationDeniedException("Unauthorized: Not an admin of current warehouse.");
+        }
+    }
 }

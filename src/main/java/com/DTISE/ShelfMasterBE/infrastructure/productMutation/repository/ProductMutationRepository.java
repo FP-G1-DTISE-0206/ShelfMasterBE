@@ -22,6 +22,7 @@ public interface ProductMutationRepository extends JpaRepository<ProductMutation
            pm.destinationId,
            pm.product.id,
            pm.product.name,
+           pm.quantity,
            pm.requestedByUser.id,
            pm.requestedByUser.userName,
            COALESCE(pm.processedByUser.id, 0),

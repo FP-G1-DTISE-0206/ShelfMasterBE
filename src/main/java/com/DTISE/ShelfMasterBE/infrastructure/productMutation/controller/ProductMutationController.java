@@ -19,19 +19,22 @@ public class ProductMutationController {
     private final CreateProductMutationUseCase createProductMutationUseCase;
     private final RejectOrCancelProductMutationUseCase rejectOrCancelProductMutationUseCase;
     private final ApproveProductMutationUseCase approveProductMutationUseCase;
+    private final GetDetailLogsUseCase getDetailLogsUseCase;
 
     public ProductMutationController(
             AddProductStockUseCase addProductStockUseCase,
             GetProductMutationUseCase getProductMutationUseCase,
             CreateProductMutationUseCase createProductMutationUseCase,
             RejectOrCancelProductMutationUseCase rejectOrCancelProductMutationUseCase,
-            ApproveProductMutationUseCase approveProductMutationUseCase
+            ApproveProductMutationUseCase approveProductMutationUseCase,
+            GetDetailLogsUseCase getDetailLogsUseCase
     ) {
         this.addProductStockUseCase = addProductStockUseCase;
         this.getProductMutationUseCase = getProductMutationUseCase;
         this.createProductMutationUseCase = createProductMutationUseCase;
         this.rejectOrCancelProductMutationUseCase = rejectOrCancelProductMutationUseCase;
         this.approveProductMutationUseCase = approveProductMutationUseCase;
+        this.getDetailLogsUseCase = getDetailLogsUseCase;
     }
 
     @PostMapping("/add-stock")
@@ -90,6 +93,14 @@ public class ProductMutationController {
         return ApiResponse.successfulResponse(
                 "Internal mutation approved successfully",
                 approveProductMutationUseCase.approveProductMutation(id)
+        );
+    }
+
+    @GetMapping("logs/{id}")
+    public ResponseEntity<?> getLogs(@PathVariable Long id) {
+        return ApiResponse.successfulResponse(
+                "Logs retrieved successfully",
+                getDetailLogsUseCase.getLogs(id)
         );
     }
 }

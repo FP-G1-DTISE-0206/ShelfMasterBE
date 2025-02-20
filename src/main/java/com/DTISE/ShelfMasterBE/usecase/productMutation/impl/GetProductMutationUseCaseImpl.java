@@ -37,7 +37,6 @@ public class GetProductMutationUseCaseImpl implements GetProductMutationUseCase 
     }
 
     private void validateUserAccess(Long warehouseId) {
-        if(warehouseId == null) return;
         User user = userRepository.findById(Claims.getUserIdFromJwt())
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
         if (PermissionUtils.isSuperAdmin(user)) return;
