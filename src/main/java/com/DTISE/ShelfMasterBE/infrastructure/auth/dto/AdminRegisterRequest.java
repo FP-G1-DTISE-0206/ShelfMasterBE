@@ -8,7 +8,6 @@ public class AdminRegisterRequest {
     private String email;
     private String userName;
     private String password;
-    private Long warehouseId;
 
     public User toEntity() {
         User user = new User();
