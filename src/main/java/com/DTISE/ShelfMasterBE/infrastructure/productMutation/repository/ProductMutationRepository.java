@@ -14,27 +14,40 @@ import java.time.OffsetDateTime;
 
 public interface ProductMutationRepository extends JpaRepository<ProductMutation, Long> {
     @Query("""
-        SELECT pm FROM ProductMutation pm
-        WHERE (:search IS NULL OR :search = ''
-               OR LOWER(pm.product.name) LIKE LOWER(CONCAT('%', :search, '%')))
-        AND EXISTS (
-            SELECT 1 FROM MutationType mt
-            WHERE (mt.originType = :warehouse OR mt.destinationType = :warehouse)
-            AND mt = pm.mutationType
-        )
-        AND (pm.originId = :warehouseId OR pm.destinationId = :warehouseId)
+        SELECT new com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.ProductMutationResponse(
+           pm.id,
+           pm.mutationType.originType,
+           pm.mutationType.destinationType,
+           pm.originId,
+           pm.destinationId,
+           pm.product.id,
+           pm.product.name,
+           pm.requestedByUser.id,
+           pm.requestedByUser.userName,
+           COALESCE(pm.processedByUser.id, 0),
+           COALESCE(pm.processedByUser.userName, ''),
+           pm.isApproved
+       )
+       FROM ProductMutation pm
+       WHERE (:search IS NULL OR :search = ''
+              OR LOWER(pm.product.name) LIKE LOWER(CONCAT('%', :search, '%')))
+       AND EXISTS (
+           SELECT 1 FROM MutationType mt
+           WHERE (mt.originType = :warehouse OR mt.destinationType = :warehouse)
+           AND mt = pm.mutationType
+       )
+       AND (pm.originId = :warehouseId OR pm.destinationId = :warehouseId)
     """)
-    Page<ProductMutation> getAllBySearchAndWarehouseId(
+    Page<ProductMutationResponse> getAllBySearchAndWarehouseId(
             @Param("search") String search,
             Pageable pageable,
             @Param("warehouseId") Long warehouseId,
             @Param("warehouse") MutationEntityType warehouse);
 
-
     @Modifying
     @Query("""
         UPDATE ProductMutation pm SET pm.processedByUser.id = :userId, pm.updatedAt = :newUpdatedAt
-        WHERE pm.id = :id AND pm.updatedAt = :oldUpdatedAt
+        WHERE pm.id = :id AND pm.updatedAt = :oldUpdatedAt and pm.processedByUser.id IS NULL
     """)
     int cancelOrRejectProductMutationWithOptimisticLocking(
             @Param("id") Long id,
@@ -46,7 +59,7 @@ public interface ProductMutationRepository extends JpaRepository<ProductMutation
     @Query("""
         UPDATE ProductMutation pm SET pm.processedByUser.id = :userId, pm.updatedAt = :newUpdatedAt,
         pm.isApproved = true
-        WHERE pm.id = :id AND pm.updatedAt = :oldUpdatedAt
+        WHERE pm.id = :id AND pm.updatedAt = :oldUpdatedAt and pm.processedByUser.id IS NULL
     """)
     int approveProductMutationWithOptimisticLocking(
             @Param("id") Long id,

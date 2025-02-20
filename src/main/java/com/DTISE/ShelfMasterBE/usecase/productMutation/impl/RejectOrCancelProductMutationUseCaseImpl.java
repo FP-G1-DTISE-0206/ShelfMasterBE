@@ -63,7 +63,7 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
 
         User user = userRepository.findById(Claims.getUserIdFromJwt())
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
-        validateUserAccess(user, mutationToReject.getDestinationId());
+        validateUserAccess(user, mutationToReject.getOriginId());
 
         process(user, mutationToReject, "reject");
 

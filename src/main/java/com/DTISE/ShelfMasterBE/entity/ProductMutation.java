@@ -51,7 +51,6 @@ public class ProductMutation {
     @JoinColumn(name = "requested_by", nullable = false)
     private User requestedByUser;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "processed_by")
     private User processedByUser;

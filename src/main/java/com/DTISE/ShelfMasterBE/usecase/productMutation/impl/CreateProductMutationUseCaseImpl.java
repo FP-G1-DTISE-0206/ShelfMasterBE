@@ -13,8 +13,10 @@ import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductReposito
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.InternalProductMutationRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.*;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.CreateProductMutationUseCase;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class CreateProductMutationUseCaseImpl implements CreateProductMutationUseCase {
     private final MutationTypeRepository mutationTypeRepository;
     private final MutationStatusRepository mutationStatusRepository;
@@ -44,7 +46,7 @@ public class CreateProductMutationUseCaseImpl implements CreateProductMutationUs
     public Long createInternalProductMutation(InternalProductMutationRequest req) {
         User user = userRepository.findById(Claims.getUserIdFromJwt())
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
-        validateUserAccess(user, req.getWarehouseOriginId());
+        validateUserAccess(user, req.getWarehouseDestinationId());
 
         ProductMutation newProductMutation = createMutation(user, req);
         productMutationRepository.save(newProductMutation);
@@ -68,6 +70,7 @@ public class CreateProductMutationUseCaseImpl implements CreateProductMutationUs
         mutation.setProduct(getProductById(req.getProductId()));
         mutation.setMutationType(type);
         mutation.setRequestedByUser(user);
+        mutation.setIsApproved(false);
         return mutation;
     }
 
