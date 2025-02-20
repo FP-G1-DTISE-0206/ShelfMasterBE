@@ -93,21 +93,4 @@ public class ProductMutation {
     protected void onRemove() {
         deletedAt = OffsetDateTime.now();
     }
-
-    public Class<?> getOriginEntityType() {
-        return getEntityType(mutationType.getOriginType());
-    }
-
-    public Class<?> getDestinationEntityType() {
-        return getEntityType(mutationType.getDestinationType());
-    }
-
-    private Class<?> getEntityType(MutationEntityType type) {
-        return switch (type) {
-            case USER -> User.class;
-            case VENDOR -> Vendor.class;
-            case WAREHOUSE -> Warehouse.class;
-            default -> null;
-        };
-    }
 }
