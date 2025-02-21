@@ -50,7 +50,6 @@ public class UserController {
     public ResponseEntity<?> getUserAddress() {
         String email = Claims.getEmailFromJwt();
         return ApiResponse.successfulResponse("User address retrieved successfully", getUserAddressUsecase.getUserAddress(email));
-//        return  ApiResponse.successfulResponse("User address retrieved successfully");
     }
 
     @PostMapping("/address")
