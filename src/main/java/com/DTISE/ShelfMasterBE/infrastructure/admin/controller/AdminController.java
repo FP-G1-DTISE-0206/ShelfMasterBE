@@ -9,6 +9,7 @@ import com.DTISE.ShelfMasterBE.usecase.admin.ChangeAdminPasswordUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.CreateAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.DeleteAdminUsecase;
 import com.DTISE.ShelfMasterBE.usecase.admin.GetAdminsUsecase;
+import com.DTISE.ShelfMasterBE.usecase.user.GetUserUsecase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,12 +30,14 @@ public class AdminController {
     private final CreateAdminUsecase createAdminUsecase;
     private final DeleteAdminUsecase deleteAdminUsecase;
     private final ChangeAdminPasswordUsecase changeAdminPasswordUsecase;
+    private final GetUserUsecase getUserUsecase;
 
-    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase, DeleteAdminUsecase deleteAdminUsecase, ChangeAdminPasswordUsecase changeAdminPasswordUsecase) {
+    public AdminController(GetAdminsUsecase getAdminsUsecase, CreateAdminUsecase createAdminUsecase, DeleteAdminUsecase deleteAdminUsecase, ChangeAdminPasswordUsecase changeAdminPasswordUsecase, GetUserUsecase getUserUsecase) {
         this.getAdminsUsecase = getAdminsUsecase;
         this.createAdminUsecase = createAdminUsecase;
         this.deleteAdminUsecase = deleteAdminUsecase;
         this.changeAdminPasswordUsecase = changeAdminPasswordUsecase;
+        this.getUserUsecase = getUserUsecase;
     }
 
     @GetMapping()
@@ -47,6 +50,21 @@ public class AdminController {
                 "Admin list retrieved successfully",
                 Pagination.mapResponse(getAdminsUsecase
                         .getAdmins(
+                                Pagination.createPageable(start, length, field, order),
+                                search))
+        );
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getUsers(@RequestParam int start,
+                                       @RequestParam int length,
+                                       @RequestParam(required = false) String search,
+                                       @RequestParam(required = false) String field,
+                                       @RequestParam(required = false) String order) {
+        return ApiResponse.successfulResponse(
+                "User list retrieved successfully",
+                Pagination.mapResponse(getUserUsecase
+                        .getUsers(
                                 Pagination.createPageable(start, length, field, order),
                                 search))
         );
