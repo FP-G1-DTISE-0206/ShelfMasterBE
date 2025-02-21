@@ -21,6 +21,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "     OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<User> findAdminsBySearch(@Param("search") String search, Pageable pageable);
 
+    @Query("SELECT DISTINCT u FROM User u " +
+            "JOIN u.roles r " +
+            "WHERE (:search IS NULL OR :search = '' " +
+            "     OR LOWER(u.userName) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "     OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "     OR LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))) ")
+    Page<User> findUsersBySearch(@Param("search") String search, Pageable pageable);
+
+
     @Query("SELECT u FROM User u " +
             "JOIN u.roles r " +
             "WHERE r.name = 'WH_ADMIN' " +
