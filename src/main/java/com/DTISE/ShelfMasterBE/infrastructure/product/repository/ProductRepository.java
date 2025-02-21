@@ -22,22 +22,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             EXISTS (SELECT 1 FROM p.categories c WHERE c.id IN :categoryIds)
             AND SIZE(p.categories) > 0
         ))
+        AND (:warehouseId IS NULL OR (
+            EXISTS (SELECT 1 FROM p.stock s WHERE s.warehouseId = :warehouseId)
+        ))
     """)
     Page<Product> findAllBySearchAndOrWarehouseId(
             @Param("search") String search,
             @Param("categoryIds") List<Long> categoryIds,
-            Pageable pageable,
-            @Param("warehouseId") Long warehouseId
-    );
-
-    @Query("""
-        SELECT p FROM Product p
-        WHERE (:search IS NULL OR :search = ''
-        OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
-        AND (EXISTS (SELECT 1 FROM p.stock s WHERE s.warehouseId = :warehouseId))
-    """)
-    Page<Product> findAllBySearchAndWarehouseId(
-            @Param("search") String search,
             Pageable pageable,
             @Param("warehouseId") Long warehouseId
     );

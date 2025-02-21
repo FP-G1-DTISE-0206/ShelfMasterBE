@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AutoMutationRequest {
     private Long orderId;
+    private Long warehouseId;
 }
