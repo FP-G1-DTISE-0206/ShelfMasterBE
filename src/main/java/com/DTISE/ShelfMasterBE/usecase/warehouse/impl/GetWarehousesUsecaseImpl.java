@@ -1,6 +1,7 @@
 package com.DTISE.ShelfMasterBE.usecase.warehouse.impl;
 
 
+import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseFullResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.repository.WarehouseRepository;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.GetWarehousesUsecase;
@@ -20,11 +21,11 @@ public class GetWarehousesUsecaseImpl implements GetWarehousesUsecase {
     @Override
     public Page<WarehouseResponse> getWarehouses(Pageable pageable, String search) {
         return warehouseRepository.findWarehousesBySearch(search, pageable)
-                .map(warehouse -> new WarehouseResponse(
-                                warehouse.getId(),
-                                warehouse.getName(),
-                                warehouse.getLocation()
-                        )
-                );
+                .map(WarehouseResponse::new);
+    }
+
+    @Override
+    public WarehouseFullResponse getWarehouse(Long warehouseId) {
+        return warehouseRepository.findById(warehouseId).map(WarehouseFullResponse::new).orElse(null);
     }
 }

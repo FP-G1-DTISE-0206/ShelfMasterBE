@@ -1,9 +1,8 @@
 package com.DTISE.ShelfMasterBE.usecase.admin;
 
-import com.DTISE.ShelfMasterBE.infrastructure.admin.dto.AdminResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.AdminRegisterRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.auth.dto.RegisterResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.user.dto.UserResponse;
 
 public interface CreateAdminUsecase {
-    AdminResponse createAdmin(AdminRegisterRequest req);
+    UserResponse createAdmin(AdminRegisterRequest req);
 }
