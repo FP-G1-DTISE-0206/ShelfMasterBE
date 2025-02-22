@@ -2,22 +2,16 @@ package com.DTISE.ShelfMasterBE.infrastructure.product.controller;
 
 import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
-import com.DTISE.ShelfMasterBE.entity.User;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.CreateProductRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.product.dto.GetProductResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.dto.UpdateProductRequest;
 import com.DTISE.ShelfMasterBE.usecase.product.CreateProductUseCase;
 import com.DTISE.ShelfMasterBE.usecase.product.DeleteProductUseCase;
 import com.DTISE.ShelfMasterBE.usecase.product.GetProductsUseCase;
 import com.DTISE.ShelfMasterBE.usecase.product.UpdateProductUseCase;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,4 +85,31 @@ public class ProductController {
         deleteProductUseCase.deleteProduct(id);
         return ApiResponse.successfulResponse("Product deleted successfully");
     }
+
+    @PostMapping("/calculate-total")
+    public ResponseEntity<?> calculateTotalPrice(@RequestBody CartRequest cartRequest) {
+        if (cartRequest == null || cartRequest.getCartItems() == null || cartRequest.getCartItems().isEmpty()) {
+            return ResponseEntity.badRequest().body("Invalid cart data. Ensure the request body is correct.");
+        }
+
+        System.out.println("🛒 Received Cart Request: " + cartRequest);
+
+        double totalPrice = cartRequest.getCartItems().stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+
+        int totalItems = cartRequest.getCartItems().stream()
+                .mapToInt(item -> item.getQuantity())
+                .sum();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalPrice", totalPrice);
+        response.put("totalItems", totalItems);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
 }
