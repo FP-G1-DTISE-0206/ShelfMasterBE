@@ -5,5 +5,5 @@ import java.util.List;
 
 @Data
 public class CartCalculationRequest {
-    private List<CartItemRequest> cartItems;
+    private List<CartRequest> cartItems;
 }

@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/review/average_stars").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/review").permitAll()
                         //  Define rest of the routes to be private
+                        .requestMatchers("/api/v1/product/calculate-total").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -7,13 +7,11 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class PaymentResponse {
-
-    private String transactionId;
-    private String paymentUrl;
-    private String status;
+    private String orderId;
+    private String transactionToken;
+//    private String redirectUrl;
     private BigDecimal totalAmount;
-
 }

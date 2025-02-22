@@ -1,16 +1,19 @@
 package com.DTISE.ShelfMasterBE.infrastructure.payment.dto;
 
-
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PaymentRequest {
 
+    @NotNull(message = "Order ID is required")
     private String orderId;
-    private List<CartItemRequest> cartItems; // <productId, quantity>
-    private BigDecimal amount;
+
+    @NotNull(message = "Total Amount is required")
+    @Min(value = 1000, message = "Total Amount must be at least 1000")
+    private BigDecimal totalAmount;
+
 }

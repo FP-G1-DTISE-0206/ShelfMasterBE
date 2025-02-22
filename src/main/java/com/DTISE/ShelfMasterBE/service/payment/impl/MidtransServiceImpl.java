@@ -1,5 +1,7 @@
 package com.DTISE.ShelfMasterBE.service.payment.impl;
 
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentResponse;
 import com.midtrans.httpclient.SnapApi;
 import com.midtrans.httpclient.TransactionApi;
 import com.midtrans.httpclient.error.MidtransError;
@@ -52,5 +54,10 @@ public class MidtransServiceImpl implements MidtransService {
         } catch (MidtransError e) {
             throw new RuntimeException("Failed to check Midtrans status: " + e.getMessage());
         }
+    }
+
+    @Override
+    public PaymentResponse createTransaction(CartRequest cartRequest) {
+        return null;
     }
 }

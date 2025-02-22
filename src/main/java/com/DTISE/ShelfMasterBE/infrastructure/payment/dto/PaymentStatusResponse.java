@@ -12,4 +12,7 @@ public class PaymentStatusResponse {
     private String status;
     private String amount;
     private String transactionTime;
+
+    public PaymentStatusResponse(String transactionId, String status) {
+    }
 }
