@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "midtrans")
-public class MidtransConfigProperties {}
+public class MidtransConfigProperties {
 
-//    private String serverKey;
-//    private String clientKey;
-//    private boolean isProduction;
-//}
+    private String serverKey;
+    private String clientKey;
+    private boolean isProduction;
+}
