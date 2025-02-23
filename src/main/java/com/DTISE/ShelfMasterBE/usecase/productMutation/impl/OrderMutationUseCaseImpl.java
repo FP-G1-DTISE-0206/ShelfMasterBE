@@ -110,48 +110,46 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
         Integer length = 10, page = 1;
         AtomicReference<Long> remainingQuantity = new AtomicReference<>(orderItem.getQuantity());
         while (remainingQuantity.get() > 0) {
-            Pageable pageable = Pagination.createPageable((length * page) - length, length);
-            Page<ProductStock> productStocks = stockRepo.getStockByProductIdOrderByLocation(
-                    pageable, orderItem.getProductId(), localWarehouseId
-            );
+            Page<ProductStock> productStocks = fetchProductStocks(orderItem.getProductId(), length, page);
             if(productStocks.isEmpty() && remainingQuantity.get() < 0) {
                 throw new InsufficientStockException("Insufficient stock");
             }
-            productStocks.forEach(productStock -> {
-                if(productStock.getWarehouseId().equals(localWarehouseId)) {
-                    remainingQuantity.getAndSet(
-                            remainingQuantity.get() - productStock.getQuantity()
-                    );
-                } else {
-                    if(productStock.getQuantity() < remainingQuantity.get()) {
-                        remainingQuantity.getAndSet(remainingQuantity.get() - internalAutoMutate(
-                                orderItem.getProductId(),
-                                productStock.getQuantity(),
-                                productStock.getWarehouseId(),
-                                localWarehouseId
-                        ));
-                    } else {
-                        remainingQuantity.getAndSet(remainingQuantity.get()  - internalAutoMutate(
-                                orderItem.getProductId(),
-                                remainingQuantity.get(),
-                                productStock.getWarehouseId(),
-                                localWarehouseId
-                        ));
-                    }
-                }
-            });
+            processStockTransfers(productStocks, orderItem, remainingQuantity);
             if(!productStocks.hasNext() && remainingQuantity.get() > 0) {
                 throw new InsufficientStockException("Insufficient stock");
             }
             page++;
         }
 
-        orderAutoMutate(
-                orderItem.getProductId(),
-                orderItem.getQuantity(),
-                buyerId,
-                localWarehouseId
+        orderAutoMutate(orderItem.getProductId(), orderItem.getQuantity(),
+                buyerId, localWarehouseId);
+    }
+
+    private Page<ProductStock> fetchProductStocks(Long productId, Integer length, Integer page) {
+        Pageable pageable = Pagination.createPageable((length * page) - length, length);
+        return stockRepo.getStockByProductIdOrderByLocation(
+                pageable, productId, localWarehouseId
         );
+    }
+
+    private void processStockTransfers(Page<ProductStock> productStocks, OrderItem orderItem,
+                                       AtomicReference<Long> remainingQuantity) {
+        productStocks.forEach(productStock -> {
+            if(productStock.getWarehouseId().equals(localWarehouseId)) {
+                remainingQuantity.getAndSet(
+                        remainingQuantity.get() - productStock.getQuantity()
+                );
+            } else {
+                transferStockBetweenWarehouse(orderItem.getProductId(), productStock, remainingQuantity);
+            }
+        });
+    }
+
+    private void transferStockBetweenWarehouse(Long productId, ProductStock productStock,
+                                               AtomicReference<Long> remainingQuantity) {
+        Long transferQty = Math.min(productStock.getQuantity(), remainingQuantity.get());
+        remainingQuantity.getAndSet(remainingQuantity.get() - internalAutoMutate(productId,
+                transferQty, productStock.getWarehouseId(), localWarehouseId));
     }
 
     private Long internalAutoMutate(
