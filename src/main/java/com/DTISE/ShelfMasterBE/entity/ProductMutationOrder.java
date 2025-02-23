@@ -12,32 +12,25 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_stock")
+@Table(name = "product_mutation_order")
 @SQLRestriction("deleted_at IS NULL")
-public class ProductStock {
+public class ProductMutationOrder {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_stock_id_gen")
-    @SequenceGenerator(name = "product_stock_id_gen",
-            sequenceName = "product_stock_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_mutation_order_id_gen")
+    @SequenceGenerator(name = "product_mutation_order_id_gen", sequenceName = "product_mutation_order_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @NotNull
-    @Column(name = "warehouse_id", nullable = false)
-    private Long warehouseId;
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
 
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @Column(name = "ordered_product_mutation_id", nullable = false)
+    private Long orderedProductMutationId;
 
-    @NotNull
-    @Column(name = "quantity")
-    private Long quantity;
-
-    @NotNull
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version = 0L;
+    @Column(name = "returned_product_mutation_id")
+    private Long returnedProductMutationId;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")

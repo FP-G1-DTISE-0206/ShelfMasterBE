@@ -111,14 +111,14 @@ public class ApproveProductMutationUseCaseImpl implements ApproveProductMutation
     }
 
     private void retryWithOptimisticLocking(RetryingTask task) {
-        int attempts = 0;
-        while (attempts < 3) {
+        int attempts = 0, max = 3;
+        while (attempts < max) {
             try {
                 task.execute();
-                attempts = 3;
+                attempts = max;
             } catch (OptimisticLockException e) {
                 attempts++;
-                if (attempts == 3) throw new RuntimeException(
+                if (attempts == max) throw new RuntimeException(
                         "Failed to add stock because it was modified by another "
                                 + "transaction after 3 retries."
                 );
