@@ -2,6 +2,7 @@ package com.DTISE.ShelfMasterBE.usecase.productMutation.impl;
 
 import com.DTISE.ShelfMasterBE.common.enums.MutationEntityType;
 import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
+import com.DTISE.ShelfMasterBE.common.exceptions.InsufficientStockException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationStatusNotFoundException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationTypeNotFoundException;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
@@ -30,10 +31,12 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
     private final MutationTypeRepository mutationTypeRepo;
     private final ProductRepository productRepo;
     private final MutationStatusRepository mutationStatusRepo;
+    private final ProductMutationOrderRepository mutationOrderRepo;
 
     private User system;
     private MutationType internalMutationType;
     private MutationType orderMutationType;
+    private Long orderId;
     private Long buyerId;
     private Long localWarehouseId;
     private MutationStatus isApproved;
@@ -46,7 +49,8 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
             ProductStockRepository productStockRepository,
             MutationTypeRepository mutationTypeRepository,
             ProductRepository productRepository,
-            MutationStatusRepository mutationStatusRepository) {
+            MutationStatusRepository mutationStatusRepository,
+            ProductMutationOrderRepository productMutationOrderRepository) {
         userRepo = userRepository;
         orderItemRepo = orderItemRepository;
         mutationRepo = productMutationRepository;
@@ -55,12 +59,13 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
         mutationTypeRepo = mutationTypeRepository;
         productRepo = productRepository;
         mutationStatusRepo = mutationStatusRepository;
+        mutationOrderRepo = productMutationOrderRepository;
     }
 
     @Override
     @Transactional
     public Long orderMutateAll(AutoMutationRequest request) {
-        prepareSystem(request.getUserId(), request.getWarehouseId());
+        prepareSystem(request.getOrderId(), request.getUserId(), request.getWarehouseId());
         orderItemRepo.findAllByOrderId(request.getOrderId())
                 .forEach(this::processMutation);
         return request.getOrderId();
@@ -73,7 +78,7 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
 
     private void processMutation(OrderItem orderItem) {
         if(stockRepo.getTotalStockByProductId(orderItem.getProductId()) <= 0L) {
-            throw new RuntimeException("Insufficient stock");
+            throw new InsufficientStockException("Insufficient stock");
         }
 
         ProductStock stock = stockRepo.findFirstByProductIdAndWarehouseId(
@@ -110,7 +115,7 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
                     pageable, orderItem.getProductId(), localWarehouseId
             );
             if(productStocks.isEmpty() && remainingQuantity.get() < 0) {
-                throw new RuntimeException("Insufficient stock");
+                throw new InsufficientStockException("Insufficient stock");
             }
             productStocks.forEach(productStock -> {
                 if(productStock.getWarehouseId().equals(localWarehouseId)) {
@@ -119,27 +124,24 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
                     );
                 } else {
                     if(productStock.getQuantity() < remainingQuantity.get()) {
-
-                        internalAutoMutate(
+                        remainingQuantity.getAndSet(remainingQuantity.get() - internalAutoMutate(
                                 orderItem.getProductId(),
                                 productStock.getQuantity(),
                                 productStock.getWarehouseId(),
                                 localWarehouseId
-                        );
-                        remainingQuantity.getAndSet(remainingQuantity.get() - productStock.getQuantity());
+                        ));
                     } else {
-                        internalAutoMutate(
+                        remainingQuantity.getAndSet(remainingQuantity.get()  - internalAutoMutate(
                                 orderItem.getProductId(),
                                 remainingQuantity.get(),
                                 productStock.getWarehouseId(),
                                 localWarehouseId
-                        );
-                        remainingQuantity.set(0L);
+                        ));
                     }
                 }
             });
             if(!productStocks.hasNext() && remainingQuantity.get() > 0) {
-                throw new RuntimeException("Insufficient stock");
+                throw new InsufficientStockException("Insufficient stock");
             }
             page++;
         }
@@ -152,19 +154,24 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
         );
     }
 
-    private void internalAutoMutate(
+    private Long internalAutoMutate(
             Long productId,
             Long quantity,
             Long originId,
             Long destinationId
     ) {
-        ProductMutation newProductMutation = createAutoMutation(
+        ProductMutation newProductMutation = toProductMutationEntity(
                 productId, quantity, originId, destinationId, internalMutationType);
+        newProductMutation.setQuantity(updateOriginStock(newProductMutation));
+        if(newProductMutation.getQuantity() == 0L) {
+            return 0L;
+        }
 
+        newProductMutation = mutationRepo.save(newProductMutation);
         createMutationLog(newProductMutation);
-
-        updateOriginStock(newProductMutation);
+        createMutationOrder(newProductMutation);
         updateDestinationStock(newProductMutation);
+        return newProductMutation.getQuantity();
     }
 
     private void orderAutoMutate(
@@ -177,11 +184,24 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
                 productId, quantity, originId, destinationId, orderMutationType);
 
         createMutationLog(newProductMutation);
+        createMutationOrder(newProductMutation);
 
-        updateOriginStock(newProductMutation);
+        updateOrderStock(newProductMutation);
     }
 
     private ProductMutation createAutoMutation(
+            Long productId,
+            Long quantity,
+            Long originId,
+            Long destinationId,
+            MutationType type
+    ) {
+        return mutationRepo.save(toProductMutationEntity(
+                productId, quantity, originId, destinationId, type
+        ));
+    }
+
+    private ProductMutation toProductMutationEntity(
             Long productId,
             Long quantity,
             Long originId,
@@ -197,7 +217,7 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
         mutation.setRequestedByUser(system);
         mutation.setProcessedByUser(system);
         mutation.setIsApproved(true);
-        return mutationRepo.save(mutation);
+        return mutation;
     }
 
     private void createMutationLog(ProductMutation mutation) {
@@ -207,12 +227,20 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
         mutationLogRepo.save(log);
     }
 
+    private void createMutationOrder(ProductMutation mutation) {
+        ProductMutationOrder newMutationOrder = new ProductMutationOrder();
+        newMutationOrder.setOrderId(orderId);
+        newMutationOrder.setOrderedProductMutationId(mutation.getId());
+        mutationOrderRepo.save(newMutationOrder);
+    }
+
     private Product getProductById(Long id) {
         return productRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("No product with ID: " + id));
     }
 
-    private void prepareSystem(Long buyerId, Long localWarehouseId) {
+    private void prepareSystem(Long orderId, Long buyerId, Long localWarehouseId) {
+        this.orderId = orderId;
         this.buyerId = buyerId;
         this.localWarehouseId = localWarehouseId;
         setSystem();
@@ -237,15 +265,24 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
                 .orElseThrow(() -> new MutationStatusNotFoundException("Status not found."));
     }
 
-    private void updateOriginStock(ProductMutation productMutation) {
+    private Long updateOriginStock(ProductMutation productMutation) {
+        AtomicReference<Long> transferredQty = new AtomicReference<>(0L);
         retryWithOptimisticLocking(() -> {
             ProductStock stock = stockRepo.findFirstByProductIdAndWarehouseId(
                             productMutation.getProduct().getId(), productMutation.getOriginId())
-                    .orElseThrow(() -> new RuntimeException("Insufficient Origin warehouse stock"));
-            if (stock.getQuantity() < productMutation.getQuantity()) throw new RuntimeException("Insufficient stock");
-            stock.setQuantity(stock.getQuantity() - productMutation.getQuantity());
+                    .orElseThrow(() -> new RuntimeException("Origin warehouse stock exist but return empty"));
+            if (stock.getQuantity() == 0L) {
+                transferredQty.set(0L);
+                return;
+            }
+
+            Long availableQty = Math.min(stock.getQuantity(), productMutation.getQuantity());
+            stock.setQuantity(stock.getQuantity() - availableQty);
             stockRepo.save(stock);
+
+            transferredQty.set(availableQty);
         });
+        return transferredQty.get();
     }
 
     private void updateDestinationStock(ProductMutation productMutation) {
@@ -255,6 +292,17 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
                     .orElseThrow(() -> new RuntimeException("Destination warehouse stock added but return empty"));
             destinationStock.setQuantity(destinationStock.getQuantity() + productMutation.getQuantity());
             stockRepo.save(destinationStock);
+        });
+    }
+
+    private void updateOrderStock(ProductMutation productMutation) {
+        retryWithOptimisticLocking(() -> {
+            ProductStock stock = stockRepo.findFirstByProductIdAndWarehouseId(
+                            productMutation.getProduct().getId(), productMutation.getOriginId())
+                    .orElseThrow(() -> new RuntimeException("Local warehouse stock exist but return empty"));
+            if (stock.getQuantity() < productMutation.getQuantity()) throw new InsufficientStockException("Insufficient stock");
+            stock.setQuantity(stock.getQuantity() - productMutation.getQuantity());
+            stockRepo.save(stock);
         });
     }
 

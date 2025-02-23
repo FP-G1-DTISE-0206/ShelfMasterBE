@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ProductMutationOrderRepository extends JpaRepository<ProductMutationOrderRepository, Long> {
+public interface ProductMutationOrderRepository extends JpaRepository<ProductMutationOrder, Long> {
     List<ProductMutationOrder> findAllByOrderId(Long orderId);
 }

@@ -1,6 +1,7 @@
 package com.DTISE.ShelfMasterBE.usecase.productMutation.impl;
 
 import com.DTISE.ShelfMasterBE.common.enums.MutationStatusEnum;
+import com.DTISE.ShelfMasterBE.common.exceptions.InsufficientStockException;
 import com.DTISE.ShelfMasterBE.common.exceptions.MutationStatusNotFoundException;
 import com.DTISE.ShelfMasterBE.common.tools.PermissionUtils;
 import com.DTISE.ShelfMasterBE.entity.*;
@@ -83,8 +84,8 @@ public class ApproveProductMutationUseCaseImpl implements ApproveProductMutation
         retryWithOptimisticLocking(() -> {
             ProductStock stock = productStockRepo.findFirstByProductIdAndWarehouseId(
                             productMutation.getProduct().getId(), productMutation.getOriginId())
-                    .orElseThrow(() -> new RuntimeException("Insufficient stock"));
-            if (stock.getQuantity() < productMutation.getQuantity()) throw new RuntimeException("Insufficient stock");
+                    .orElseThrow(() -> new InsufficientStockException("Insufficient stock"));
+            if (stock.getQuantity() < productMutation.getQuantity()) throw new InsufficientStockException("Insufficient stock");
             stock.setQuantity(stock.getQuantity() - productMutation.getQuantity());
             productStockRepo.save(stock);
         });
