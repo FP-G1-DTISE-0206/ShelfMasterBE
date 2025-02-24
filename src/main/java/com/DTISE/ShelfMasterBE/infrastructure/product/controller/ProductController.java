@@ -10,11 +10,11 @@ import com.DTISE.ShelfMasterBE.usecase.product.GetProductsUseCase;
 import com.DTISE.ShelfMasterBE.usecase.product.UpdateProductUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartRequest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -38,7 +38,7 @@ public class ProductController {
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody CreateProductRequest req) {
+    public ResponseEntity<?> createProduct(@RequestBody @Validated CreateProductRequest req) {
         return ApiResponse.successfulResponse(
                 "Create new product success",
                 createProductUseCase.createProduct(req));
@@ -46,18 +46,21 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<?> getProducts(
-            @RequestParam Integer start,
-            @RequestParam Integer length,
-            @RequestParam String field,
-            @RequestParam String order,
-            @RequestParam String search
-    ) {
+            @RequestParam(defaultValue = "0") Integer start,
+            @RequestParam(defaultValue = "10") Integer length,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) List<Long> category,
+            @RequestParam(required = false) Long warehouseId) {
         return ApiResponse.successfulResponse(
                 "Products retrieved successfully",
                 Pagination.mapResponse(getProductsUseCase
                         .getProducts(
                                 Pagination.createPageable(start, length, field, order),
-                                search))
+                                search,
+                                category,
+                                warehouseId))
         );
     }
 
@@ -73,7 +76,7 @@ public class ProductController {
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id,
-                                           @RequestBody UpdateProductRequest req) {
+                                           @RequestBody @Validated UpdateProductRequest req) {
         return ApiResponse.successfulResponse(
                 "Product updated successfully",
                 updateProductUseCase.updateProduct(id, req));

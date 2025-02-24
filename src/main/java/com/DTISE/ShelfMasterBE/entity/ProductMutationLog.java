@@ -12,23 +12,23 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_images")
+@Table(name = "product_mutation_log")
 @SQLRestriction("deleted_at IS NULL")
-public class ProductImage {
+public class ProductMutationLog {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_images_id_gen")
-    @SequenceGenerator(name = "product_images_id_gen",
-            sequenceName = "product_images_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_mutation_log_id_gen")
+    @SequenceGenerator(name = "product_mutation_log_id_gen", sequenceName = "product_mutation_log_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @Column(name = "product_mutation_id", nullable = false)
+    private Long productMutationId;
 
     @NotNull
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "mutation_status_id", referencedColumnName = "id", nullable = false)
+    private MutationStatus mutationStatus;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
