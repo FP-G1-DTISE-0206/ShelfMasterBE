@@ -64,11 +64,11 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
 
     @Override
     @Transactional
-    public Long orderMutateAll(AutoMutationRequest request) {
-        prepareSystem(request.getOrderId(), request.getUserId(), request.getWarehouseId());
-        orderItemRepo.findAllByOrderId(request.getOrderId())
+    public Long orderMutateAll(Long userId, Long orderId, Long warehouseId) {
+        prepareSystem(orderId, userId, warehouseId);
+        orderItemRepo.findAllByOrderId(orderId)
                 .forEach(this::processMutation);
-        return request.getOrderId();
+        return orderId;
     }
 
     @Override
