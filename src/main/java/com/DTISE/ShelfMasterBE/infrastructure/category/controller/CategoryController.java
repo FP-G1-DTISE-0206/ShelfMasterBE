@@ -10,6 +10,7 @@ import com.DTISE.ShelfMasterBE.usecase.category.GetCategoriesUseCase;
 import com.DTISE.ShelfMasterBE.usecase.category.UpdateCategoryUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,16 +35,16 @@ public class CategoryController {
 
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PostMapping
-    public ResponseEntity<?> createCategory(@RequestBody CreateCategoryRequest req) {
+    public ResponseEntity<?> createCategory(@RequestBody @Validated CreateCategoryRequest req) {
         return ApiResponse.successfulResponse(
                 "Create new category success",
                 createCategoryUseCase.createCategory(req));
     }
 
     @GetMapping
-    public ResponseEntity<?> getCategories(@RequestParam Integer start,
-                                           @RequestParam Integer length,
-                                           @RequestParam String search) {
+    public ResponseEntity<?> getCategories(@RequestParam(defaultValue = "0") Integer start,
+                                           @RequestParam(defaultValue = "10") Integer length,
+                                           @RequestParam(required = false) String search) {
         return ApiResponse.successfulResponse(
                 "Categories retrieved successfully",
                 Pagination.mapResponse(
@@ -56,7 +57,7 @@ public class CategoryController {
     @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id,
-                                           @RequestBody UpdateCategoryRequest req) {
+                                           @RequestBody @Validated UpdateCategoryRequest req) {
         return ApiResponse.successfulResponse(
                 "Category updated successfully",
                 updateCategoryUseCase.updateCategory(id, req));

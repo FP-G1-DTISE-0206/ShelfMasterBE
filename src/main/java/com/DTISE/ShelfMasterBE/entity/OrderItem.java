@@ -7,28 +7,36 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "product_images")
+@Table(name = "order_items")
 @SQLRestriction("deleted_at IS NULL")
-public class ProductImage {
+public class OrderItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_images_id_gen")
-    @SequenceGenerator(name = "product_images_id_gen",
-            sequenceName = "product_images_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_item_id_gen")
+    @SequenceGenerator(name = "order_item_id_gen", sequenceName = "order_item_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @NotNull
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
 
     @NotNull
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
     @NotNull
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+    @Column(name = "quantity")
+    private Long quantity;
+
+    @NotNull
+    @Column(name = "total_price", precision = 17, scale = 2)
+    private BigDecimal totalPrice;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -58,4 +66,5 @@ public class ProductImage {
     protected void onRemove() {
         deletedAt = OffsetDateTime.now();
     }
+
 }
