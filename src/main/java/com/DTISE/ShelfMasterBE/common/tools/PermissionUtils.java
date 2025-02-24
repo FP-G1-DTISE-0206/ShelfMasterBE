@@ -1,8 +1,10 @@
 package com.DTISE.ShelfMasterBE.common.tools;
 
 import com.DTISE.ShelfMasterBE.entity.User;
+import com.DTISE.ShelfMasterBE.infrastructure.product.dto.AssignedWarehouseResponse;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 
+import java.util.List;
 import java.util.Objects;
 
 public class PermissionUtils {
@@ -25,5 +27,13 @@ public class PermissionUtils {
         if (!isAdmin) {
             throw new AuthorizationDeniedException("Unauthorized: Not an admin of current warehouse.");
         }
+    }
+
+    public static List<AssignedWarehouseResponse> getAssignedWarehouse(User user, String search) {
+        return user.getWarehouses()
+                .stream()
+                .filter(w -> search == null || w.getName().toLowerCase().contains(search.toLowerCase()))
+                .map(w -> new AssignedWarehouseResponse(w.getId(), w.getName()))
+                .toList();
     }
 }

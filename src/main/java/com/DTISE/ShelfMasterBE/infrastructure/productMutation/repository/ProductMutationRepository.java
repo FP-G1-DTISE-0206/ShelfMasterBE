@@ -35,12 +35,15 @@ public interface ProductMutationRepository extends JpaRepository<ProductMutation
        AND EXISTS (
            SELECT 1 FROM MutationType mt
            WHERE (mt = pm.mutationType)
+           AND(:mutationTypeId IS NULL OR :mutationTypeId = 0 OR
+                mt.id = :mutationTypeId)
            AND((mt.originType = :warehouse AND pm.originId = :warehouseId)
            OR (pm.destinationId = :warehouseId AND mt.destinationType = :warehouse)))
     """)
     Page<ProductMutationResponse> getAllBySearchAndWarehouseId(
             @Param("search") String search,
             Pageable pageable,
+            @Param("mutationTypeId") Long mutationTypeId,
             @Param("warehouseId") Long warehouseId,
             @Param("warehouse") MutationEntityType warehouse);
 

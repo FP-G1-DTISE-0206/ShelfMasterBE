@@ -6,6 +6,8 @@ import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AddProductStoc
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AutoMutationRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.InternalProductMutationRequest;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.*;
+import com.DTISE.ShelfMasterBE.usecase.warehouse.GetAssignedWarehouseUseCase;
+import com.DTISE.ShelfMasterBE.usecase.warehouse.impl.GetAssignedWarehouseUseCaseImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -23,6 +25,8 @@ public class ProductMutationController {
     private final GetDetailLogsUseCase getDetailLogsUseCase;
     private final OrderMutationUseCase orderMutationUseCase;
     private final ReturnOrderMutationUseCase returnOrderMutationUseCase;
+    private final GetMutationTypeUseCase getMutationTypeUseCase;
+    private final GetAssignedWarehouseUseCase getAssignedWarehouseUseCase;
 
     public ProductMutationController(
             AddProductStockUseCase addProductStockUseCase,
@@ -32,7 +36,9 @@ public class ProductMutationController {
             ApproveProductMutationUseCase approveProductMutationUseCase,
             GetDetailLogsUseCase getDetailLogsUseCase,
             OrderMutationUseCase orderMutationUseCase,
-            ReturnOrderMutationUseCase returnOrderMutationUseCase
+            ReturnOrderMutationUseCase returnOrderMutationUseCase,
+            GetMutationTypeUseCase getMutationTypeUseCase,
+            GetAssignedWarehouseUseCase getAssignedWarehouseUseCase
     ) {
         this.addProductStockUseCase = addProductStockUseCase;
         this.getProductMutationUseCase = getProductMutationUseCase;
@@ -42,6 +48,8 @@ public class ProductMutationController {
         this.getDetailLogsUseCase = getDetailLogsUseCase;
         this.orderMutationUseCase = orderMutationUseCase;
         this.returnOrderMutationUseCase = returnOrderMutationUseCase;
+        this.getMutationTypeUseCase = getMutationTypeUseCase;
+        this.getAssignedWarehouseUseCase = getAssignedWarehouseUseCase;
     }
 
     @PostMapping("/add-stock")
@@ -59,6 +67,7 @@ public class ProductMutationController {
             @RequestParam(defaultValue = "createdAt") String field,
             @RequestParam(defaultValue = "desc") String order,
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long mutationTypeId,
             @PathVariable Long warehouseId
     ) {
         return ApiResponse.successfulResponse(
@@ -66,7 +75,7 @@ public class ProductMutationController {
                 Pagination.mapResponse(getProductMutationUseCase
                         .getProductMutations(
                                 Pagination.createPageable(start, length, field, order),
-                                search,
+                                search, mutationTypeId,
                                 warehouseId))
         );
     }
@@ -108,6 +117,31 @@ public class ProductMutationController {
         return ApiResponse.successfulResponse(
                 "Logs retrieved successfully",
                 getDetailLogsUseCase.getLogs(id)
+        );
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<?> getTypes() {
+        return ApiResponse.successfulResponse(
+                "Mutation types retrieved successfully",
+                getMutationTypeUseCase.getAllMutationType()
+        );
+    }
+
+    @GetMapping("/warehouse-list")
+    public ResponseEntity<?> getAssignedWarehouse(
+            @RequestParam(defaultValue = "0") Integer start,
+            @RequestParam(defaultValue = "10") Integer length,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(required = false) String search
+    ) {
+        return ApiResponse.successfulResponse(
+                "Assigned Warehouse retrieved successfully",
+                getAssignedWarehouseUseCase.getAllAssignedWarehouse(
+                        Pagination.createPageable(start, length, field, order),
+                        search
+                )
         );
     }
 

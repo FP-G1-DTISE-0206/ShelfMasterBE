@@ -14,7 +14,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartRequest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -102,7 +104,7 @@ public class ProductController {
                 .sum();
 
         int totalItems = cartRequest.getCartItems().stream()
-                .mapToInt(item -> item.getQuantity())
+                .mapToInt(CartRequest.CartItemDTO::getQuantity)
                 .sum();
 
         Map<String, Object> response = new HashMap<>();

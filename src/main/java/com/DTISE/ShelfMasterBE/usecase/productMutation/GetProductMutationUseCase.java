@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface GetProductMutationUseCase {
-    Page<ProductMutationResponse> getProductMutations(Pageable pageable, String search, Long WarehouseId);
+    Page<ProductMutationResponse> getProductMutations(Pageable pageable, String search, Long mutationTypeId, Long WarehouseId);
 }
