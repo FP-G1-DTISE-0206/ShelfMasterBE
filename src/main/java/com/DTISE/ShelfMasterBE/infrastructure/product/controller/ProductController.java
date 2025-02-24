@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartRequest;
 
 import java.util.List;
 
@@ -87,4 +88,31 @@ public class ProductController {
         deleteProductUseCase.deleteProduct(id);
         return ApiResponse.successfulResponse("Product deleted successfully");
     }
+
+    @PostMapping("/calculate-total")
+    public ResponseEntity<?> calculateTotalPrice(@RequestBody CartRequest cartRequest) {
+        if (cartRequest == null || cartRequest.getCartItems() == null || cartRequest.getCartItems().isEmpty()) {
+            return ResponseEntity.badRequest().body("Invalid cart data. Ensure the request body is correct.");
+        }
+
+        System.out.println("🛒 Received Cart Request: " + cartRequest);
+
+        double totalPrice = cartRequest.getCartItems().stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+
+        int totalItems = cartRequest.getCartItems().stream()
+                .mapToInt(item -> item.getQuantity())
+                .sum();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalPrice", totalPrice);
+        response.put("totalItems", totalItems);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
 }
