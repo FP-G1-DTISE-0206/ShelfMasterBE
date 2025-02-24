@@ -9,10 +9,13 @@ import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.*;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.ReturnOrderMutationUseCase;
 import jakarta.persistence.OptimisticLockException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Service
 public class ReturnOrderMutationUseCaseImpl implements ReturnOrderMutationUseCase {
     private final ProductMutationOrderRepository mutationOrderRepo;
     private final ProductMutationRepository mutationRepo;
@@ -22,10 +25,10 @@ public class ReturnOrderMutationUseCaseImpl implements ReturnOrderMutationUseCas
     private final MutationStatusRepository mutationStatusRepo;
     private final ProductMutationLogRepository mutationLogRepo;
 
-    private final User system;
-    private final MutationType internalMutationType;
-    private final MutationType orderMutationType;
-    private final MutationStatus isApproved;
+    private User system;
+    private MutationType internalMutationType;
+    private MutationType orderMutationType;
+    private MutationStatus isApproved;
 
     public ReturnOrderMutationUseCaseImpl(
             ProductMutationOrderRepository productMutationOrderRepository,
@@ -42,15 +45,12 @@ public class ReturnOrderMutationUseCaseImpl implements ReturnOrderMutationUseCas
         mutationTypeRepo = mutationTypeRepository;
         mutationStatusRepo = mutationStatusRepository;
         mutationLogRepo = productMutationLogRepository;
-
-        system = getSystem();
-        internalMutationType = getType(MutationEntityType.WAREHOUSE);
-        orderMutationType = getType(MutationEntityType.USER);
-        isApproved = getIsApproved();
     }
 
     @Override
+    @Transactional
     public Long returnOrderMutateAll(Long orderId) {
+        prepareSystem();
         mutationOrderRepo.findAllByOrderIdOrderByIdDesc(orderId).forEach(this::returnOrderMutate);
         return orderId;
     }
@@ -166,6 +166,13 @@ public class ReturnOrderMutationUseCaseImpl implements ReturnOrderMutationUseCas
         return mutationStatusRepo
                 .findFirstByName(MutationStatusEnum.APPROVED)
                 .orElseThrow(() -> new MutationStatusNotFoundException("Status not found."));
+    }
+
+    private void prepareSystem() {
+        system = getSystem();
+        internalMutationType = getType(MutationEntityType.WAREHOUSE);
+        orderMutationType = getType(MutationEntityType.USER);
+        isApproved = getIsApproved();
     }
 
     private void retryWithOptimisticLocking(RetryingTask task) {

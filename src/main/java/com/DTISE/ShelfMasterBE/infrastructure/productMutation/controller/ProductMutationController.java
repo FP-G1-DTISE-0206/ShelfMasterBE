@@ -3,6 +3,7 @@ package com.DTISE.ShelfMasterBE.infrastructure.productMutation.controller;
 import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AddProductStockRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AutoMutationRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.InternalProductMutationRequest;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.*;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ public class ProductMutationController {
     private final RejectOrCancelProductMutationUseCase rejectOrCancelProductMutationUseCase;
     private final ApproveProductMutationUseCase approveProductMutationUseCase;
     private final GetDetailLogsUseCase getDetailLogsUseCase;
+    private final OrderMutationUseCase orderMutationUseCase;
+    private final ReturnOrderMutationUseCase returnOrderMutationUseCase;
 
     public ProductMutationController(
             AddProductStockUseCase addProductStockUseCase,
@@ -27,7 +30,9 @@ public class ProductMutationController {
             CreateProductMutationUseCase createProductMutationUseCase,
             RejectOrCancelProductMutationUseCase rejectOrCancelProductMutationUseCase,
             ApproveProductMutationUseCase approveProductMutationUseCase,
-            GetDetailLogsUseCase getDetailLogsUseCase
+            GetDetailLogsUseCase getDetailLogsUseCase,
+            OrderMutationUseCase orderMutationUseCase,
+            ReturnOrderMutationUseCase returnOrderMutationUseCase
     ) {
         this.addProductStockUseCase = addProductStockUseCase;
         this.getProductMutationUseCase = getProductMutationUseCase;
@@ -35,6 +40,8 @@ public class ProductMutationController {
         this.rejectOrCancelProductMutationUseCase = rejectOrCancelProductMutationUseCase;
         this.approveProductMutationUseCase = approveProductMutationUseCase;
         this.getDetailLogsUseCase = getDetailLogsUseCase;
+        this.orderMutationUseCase = orderMutationUseCase;
+        this.returnOrderMutationUseCase = returnOrderMutationUseCase;
     }
 
     @PostMapping("/add-stock")
@@ -64,7 +71,7 @@ public class ProductMutationController {
         );
     }
 
-    @PostMapping("create-mutation")
+    @PostMapping("/create-mutation")
     public ResponseEntity<?> createMutation(@RequestBody @Validated InternalProductMutationRequest request) {
         return ApiResponse.successfulResponse(
                 "Internal mutation created successfully",
@@ -72,7 +79,7 @@ public class ProductMutationController {
         );
     }
 
-    @PutMapping("cancel/{id}")
+    @PutMapping("/cancel/{id}")
     public ResponseEntity<?> cancelMutation(@PathVariable Long id) {
         return ApiResponse.successfulResponse(
                 "Internal mutation canceled successfully",
@@ -80,7 +87,7 @@ public class ProductMutationController {
         );
     }
 
-    @PutMapping("reject/{id}")
+    @PutMapping("/reject/{id}")
     public ResponseEntity<?> rejectMutation(@PathVariable Long id) {
         return ApiResponse.successfulResponse(
                 "Internal mutation rejected successfully",
@@ -88,7 +95,7 @@ public class ProductMutationController {
         );
     }
 
-    @PutMapping("approve/{id}")
+    @PutMapping("/approve/{id}")
     public ResponseEntity<?> approveMutation(@PathVariable Long id) {
         return ApiResponse.successfulResponse(
                 "Internal mutation approved successfully",
@@ -96,11 +103,36 @@ public class ProductMutationController {
         );
     }
 
-    @GetMapping("logs/{id}")
+    @GetMapping("/logs/{id}")
     public ResponseEntity<?> getLogs(@PathVariable Long id) {
         return ApiResponse.successfulResponse(
                 "Logs retrieved successfully",
                 getDetailLogsUseCase.getLogs(id)
+        );
+    }
+
+    @PostMapping("/auto")
+    public ResponseEntity<?> createAutoMutation(@RequestBody @Validated AutoMutationRequest request) {
+        return ApiResponse.successfulResponse(
+                "Auto mutation done successfully",
+                orderMutationUseCase.orderMutateAll(request.getUserId(), request.getOrderId(), request.getWarehouseId())
+        );
+    }
+
+    @PutMapping("/return/{orderId}")
+    public ResponseEntity<?> returnAutoMutation(@PathVariable Long orderId) {
+        return ApiResponse.successfulResponse(
+                "Return auto mutation done successfully",
+                returnOrderMutationUseCase.returnOrderMutateAll(orderId)
+        );
+    }
+
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
+    @GetMapping("/product/{id}")
+    public ResponseEntity<?> getTotalProductStock(@PathVariable Long id) {
+        return ApiResponse.successfulResponse(
+                "Total product stock retrieved successfully",
+                orderMutationUseCase.getProductTotalStock(id)
         );
     }
 }

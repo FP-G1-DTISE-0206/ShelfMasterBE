@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "order_item")
+@Table(name = "order_items")
 @SQLRestriction("deleted_at IS NULL")
 public class OrderItem {
     @Id
@@ -21,6 +21,10 @@ public class OrderItem {
     @SequenceGenerator(name = "order_item_id_gen", sequenceName = "order_item_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @NotNull
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
 
     @NotNull
     @Column(name = "product_id", nullable = false)

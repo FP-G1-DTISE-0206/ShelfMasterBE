@@ -10,7 +10,6 @@ import com.DTISE.ShelfMasterBE.entity.*;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderItemRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
-import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AutoMutationRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.*;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.OrderMutationUseCase;
 import jakarta.persistence.OptimisticLockException;
@@ -91,8 +90,8 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
             orderAutoMutate(
                     orderItem.getProductId(),
                     orderItem.getQuantity(),
-                    buyerId,
-                    localWarehouseId
+                    localWarehouseId,
+                    buyerId
             );
         }
     }
@@ -122,7 +121,7 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
         }
 
         orderAutoMutate(orderItem.getProductId(), orderItem.getQuantity(),
-                buyerId, localWarehouseId);
+                localWarehouseId, buyerId);
     }
 
     private Page<ProductStock> fetchProductStocks(Long productId, Integer length, Integer page) {

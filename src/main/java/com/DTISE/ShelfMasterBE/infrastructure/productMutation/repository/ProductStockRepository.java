@@ -23,9 +23,9 @@ public interface ProductStockRepository extends JpaRepository<ProductStock, Long
     Long getTotalStockByProductId(@Param("productId") Long productId);
 
     @Query("""
-       SELECT ps.*
+       SELECT ps
        FROM ProductStock ps
-       INNER JOIN Warehouse w on ps.warehouse_id = w.id
+       INNER JOIN Warehouse w on ps.warehouseId = w.id
        WHERE ps.productId = :productId AND ps.quantity > 0
        ORDER BY
          (6371 * acos(cos(radians((SELECT w2.latitude FROM
