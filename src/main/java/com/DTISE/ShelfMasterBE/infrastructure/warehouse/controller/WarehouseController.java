@@ -68,8 +68,8 @@ public class WarehouseController {
     }
 
     @GetMapping("/find-closest")
-    public ResponseEntity<?> findClosestWarehouse(@RequestBody @Validated FindClosestRequest req) {
+    public ResponseEntity<?> findClosestWarehouse(@RequestParam Long userAddressId) {
         String email = Claims.getEmailFromJwt();
-        return ApiResponse.successfulResponse("Closest warehouse found successfully", findClosestWarehouseUsecase.findClosestWarehouse(email, req.getUserAddressId()));
+        return ApiResponse.successfulResponse("Closest warehouse found successfully", findClosestWarehouseUsecase.findClosestWarehouse(email, userAddressId));
     }
 }
