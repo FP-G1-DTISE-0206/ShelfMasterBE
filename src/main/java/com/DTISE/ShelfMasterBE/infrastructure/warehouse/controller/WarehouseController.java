@@ -2,11 +2,10 @@ package com.DTISE.ShelfMasterBE.infrastructure.warehouse.controller;
 
 import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import com.DTISE.ShelfMasterBE.common.tools.Pagination;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
+import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.FindClosestRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseRequest;
-import com.DTISE.ShelfMasterBE.usecase.warehouse.CreateWarehouseUsecase;
-import com.DTISE.ShelfMasterBE.usecase.warehouse.DeleteWarehouseUsecase;
-import com.DTISE.ShelfMasterBE.usecase.warehouse.UpdateWarehouseUsecase;
-import com.DTISE.ShelfMasterBE.usecase.warehouse.GetWarehousesUsecase;
+import com.DTISE.ShelfMasterBE.usecase.warehouse.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -19,12 +18,14 @@ public class WarehouseController {
     private final CreateWarehouseUsecase createWarehouseUsecase;
     private final UpdateWarehouseUsecase updateWarehouseUsecase;
     private final DeleteWarehouseUsecase deleteWarehouseUsecase;
+    private final FindClosestWarehouseUsecase findClosestWarehouseUsecase;
 
-    public WarehouseController(GetWarehousesUsecase getWarehousesUsecase, CreateWarehouseUsecase createWarehouseUsecase, UpdateWarehouseUsecase updateWarehouseUsecase, DeleteWarehouseUsecase deleteWarehouseUsecase) {
+    public WarehouseController(GetWarehousesUsecase getWarehousesUsecase, CreateWarehouseUsecase createWarehouseUsecase, UpdateWarehouseUsecase updateWarehouseUsecase, DeleteWarehouseUsecase deleteWarehouseUsecase, FindClosestWarehouseUsecase findClosestWarehouseUsecase) {
         this.getWarehousesUsecase = getWarehousesUsecase;
         this.createWarehouseUsecase = createWarehouseUsecase;
         this.updateWarehouseUsecase = updateWarehouseUsecase;
         this.deleteWarehouseUsecase = deleteWarehouseUsecase;
+        this.findClosestWarehouseUsecase = findClosestWarehouseUsecase;
     }
 
     @GetMapping("")
@@ -64,5 +65,11 @@ public class WarehouseController {
     public ResponseEntity<?> deleteWarehouse(@PathVariable Long id) {
         deleteWarehouseUsecase.deleteWarehouse(id);
         return ApiResponse.successfulResponse("Warehouse deleted successfully");
+    }
+
+    @GetMapping("/find-closest")
+    public ResponseEntity<?> findClosestWarehouse(@RequestParam Long userAddressId) {
+        String email = Claims.getEmailFromJwt();
+        return ApiResponse.successfulResponse("Closest warehouse found successfully", findClosestWarehouseUsecase.findClosestWarehouse(email, userAddressId));
     }
 }
