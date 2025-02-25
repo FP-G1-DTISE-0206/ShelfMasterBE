@@ -38,8 +38,8 @@ public class CartController {
     }
 
     @DeleteMapping("/{userId}/{cartId}")
-    public ResponseEntity<String> removeCartItem(@PathVariable Long cartId) {
-        removeCartItemUsecase.execute(cartId);
+    public ResponseEntity<String> removeCartItem(@PathVariable Long userId ,@PathVariable Long cartId) {
+        removeCartItemUsecase.execute(userId, cartId);
         return ResponseEntity.ok("Cart item removed successfully");
     }
 
