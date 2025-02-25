@@ -30,6 +30,7 @@ public interface ProductMutationRepository extends JpaRepository<ProductMutation
            pm.isApproved
        )
        FROM ProductMutation pm
+       LEFT JOIN pm.processedByUser pbu
        WHERE (:search IS NULL OR :search = ''
               OR LOWER(pm.product.name) LIKE LOWER(CONCAT('%', :search, '%')))
        AND EXISTS (

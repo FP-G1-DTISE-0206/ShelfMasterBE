@@ -27,6 +27,7 @@ public class ProductMutationController {
     private final ReturnOrderMutationUseCase returnOrderMutationUseCase;
     private final GetMutationTypeUseCase getMutationTypeUseCase;
     private final GetAssignedWarehouseUseCase getAssignedWarehouseUseCase;
+    private final GetVendorUseCase getVendorUseCase;
 
     public ProductMutationController(
             AddProductStockUseCase addProductStockUseCase,
@@ -38,7 +39,8 @@ public class ProductMutationController {
             OrderMutationUseCase orderMutationUseCase,
             ReturnOrderMutationUseCase returnOrderMutationUseCase,
             GetMutationTypeUseCase getMutationTypeUseCase,
-            GetAssignedWarehouseUseCase getAssignedWarehouseUseCase
+            GetAssignedWarehouseUseCase getAssignedWarehouseUseCase,
+            GetVendorUseCase getVendorUseCase
     ) {
         this.addProductStockUseCase = addProductStockUseCase;
         this.getProductMutationUseCase = getProductMutationUseCase;
@@ -50,6 +52,7 @@ public class ProductMutationController {
         this.returnOrderMutationUseCase = returnOrderMutationUseCase;
         this.getMutationTypeUseCase = getMutationTypeUseCase;
         this.getAssignedWarehouseUseCase = getAssignedWarehouseUseCase;
+        this.getVendorUseCase = getVendorUseCase;
     }
 
     @PostMapping("/add-stock")
@@ -117,6 +120,23 @@ public class ProductMutationController {
         return ApiResponse.successfulResponse(
                 "Logs retrieved successfully",
                 getDetailLogsUseCase.getLogs(id)
+        );
+    }
+
+    @GetMapping("/vendor")
+    public ResponseEntity<?> getVendors(
+            @RequestParam(defaultValue = "0") Integer start,
+            @RequestParam(defaultValue = "10") Integer length,
+            @RequestParam(defaultValue = "id") String field,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(required = false) String search
+    ) {
+        return ApiResponse.successfulResponse(
+                "Mutation types retrieved successfully",
+                Pagination.mapResponse(getVendorUseCase
+                        .getVendors(
+                                Pagination.createPageable(start, length, field, order),
+                                search))
         );
     }
 
