@@ -1,43 +1,29 @@
 package com.DTISE.ShelfMasterBE.infrastructure.cart.controller;
 
-import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartCalculationRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CartRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentResponse;
-import com.DTISE.ShelfMasterBE.usecase.cart.CartCalculationUsecase;
-import lombok.RequiredArgsConstructor;
+
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemResponse;
+import com.DTISE.ShelfMasterBE.usecase.cart.AddToCartUsecase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequestMapping("/api/v1/cart")
 public class CartController {
 
-    private final CartCalculationUsecase cartCalculationUsecase;
+    private final AddToCartUsecase addToCartUsecase;
 
-    public CartController(CartCalculationUsecase cartCalculationUsecase) {
-        this.cartCalculationUsecase = cartCalculationUsecase;
+    public CartController(AddToCartUsecase addToCartUsecase) {
+        this.addToCartUsecase = addToCartUsecase;
     }
 
-    @PostMapping("/calculate-total")
-    public ResponseEntity<PaymentResponse> calculateTotal(@RequestBody CartRequest request) {
-        PaymentResponse response = cartCalculationUsecase.execute(request);
-        return ResponseEntity.ok(response);
+    @PostMapping
+    public ResponseEntity<CreateCartItemResponse> addToCart(@RequestBody CreateCartItemRequest request) {
+        System.out.println("Received request: " + request);
+        return ResponseEntity.ok(addToCartUsecase.execute(request));
     }
+
 }
-//@RestController
-//@RequestMapping("/api/v1/cart")
-//@RequiredArgsConstructor
-//public class CartController {
-//
-//    private final CartCalculationUsecase cartCalculationUsecase;
-//
-//    @PostMapping("/calculate")
-//    public ResponseEntity<PaymentResponse> calculateCart(@RequestBody CartCalculationRequest request) {
-//        PaymentResponse paymentResponse = cartCalculationUsecase.execute(request);
-//        return ResponseEntity.ok(paymentResponse);
-//    }
-//}

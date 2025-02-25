@@ -2,11 +2,13 @@ package com.DTISE.ShelfMasterBE.infrastructure.auth.repository;
 
 import com.DTISE.ShelfMasterBE.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,4 +43,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByVerificationToken(String token);
 
     Optional<User> findByVerificationTokenAndEmail(String verificationToken, String email);
+
+    Optional<Object> findById(@NotNull(message = "User ID cannot be null") BigInteger userId);
+
+
 }
