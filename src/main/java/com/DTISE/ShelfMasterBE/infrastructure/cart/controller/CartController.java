@@ -1,12 +1,12 @@
 package com.DTISE.ShelfMasterBE.infrastructure.cart.controller;
 
 
-import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemResponse;
-import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.GetCartResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.*;
 import com.DTISE.ShelfMasterBE.usecase.cart.AddToCartUsecase;
 import com.DTISE.ShelfMasterBE.usecase.cart.GetCartUsecase;
 import com.DTISE.ShelfMasterBE.usecase.cart.RemoveCartItemUsecase;
+import com.DTISE.ShelfMasterBE.usecase.cart.UpdateCartItemUsecase;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +16,13 @@ public class CartController {
 
     private final AddToCartUsecase addToCartUsecase;
     private final GetCartUsecase getCartUsecase;
+    private final UpdateCartItemUsecase updateCartItemUsecase;
     private final RemoveCartItemUsecase removeCartItemUsecase;
 
-    public CartController(AddToCartUsecase addToCartUsecase, GetCartUsecase getCartUsecase, RemoveCartItemUsecase removeCartItemUsecase) {
+    public CartController(AddToCartUsecase addToCartUsecase, GetCartUsecase getCartUsecase, UpdateCartItemUsecase updateCartItemUsecase, RemoveCartItemUsecase removeCartItemUsecase) {
         this.addToCartUsecase = addToCartUsecase;
         this.getCartUsecase = getCartUsecase;
+        this.updateCartItemUsecase = updateCartItemUsecase;
         this.removeCartItemUsecase = removeCartItemUsecase;
     }
 
@@ -41,6 +43,14 @@ public class CartController {
     public ResponseEntity<String> removeCartItem(@PathVariable Long userId ,@PathVariable Long cartId) {
         removeCartItemUsecase.execute(userId, cartId);
         return ResponseEntity.ok("Cart item removed successfully");
+    }
+
+    @PutMapping("/{cartId}")  // ✅ Updated endpoint for updating cart items
+    public ResponseEntity<UpdateCartItemResponse> updateCartItem(
+            @PathVariable Long cartId,
+            @Valid @RequestBody UpdateCartItemRequest request) {
+        UpdateCartItemResponse response = updateCartItemUsecase.execute(cartId, request);
+        return ResponseEntity.ok(response);
     }
 
 }

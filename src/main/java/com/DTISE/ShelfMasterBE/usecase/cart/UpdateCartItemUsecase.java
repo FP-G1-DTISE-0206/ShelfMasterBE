@@ -1,8 +1,8 @@
 package com.DTISE.ShelfMasterBE.usecase.cart;
 
-import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.UpdateCartItemRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.UpdateCartItemResponse;
 
 public interface UpdateCartItemUsecase {
-    CreateCartItemResponse execute(UpdateCartItemRequest request);
+    UpdateCartItemResponse execute(Long cartId, UpdateCartItemRequest request);
 }

@@ -2,18 +2,19 @@ package com.DTISE.ShelfMasterBE.infrastructure.cart.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 
 @Data
-// DTO untuk memperbarui jumlah item di cart
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateCartItemRequest {
 
-    @NotNull(message = "Cart ID cannot be null")
-    private BigInteger cartId;
 
     @NotNull(message = "Quantity cannot be null")
-    @Min(value = 0, message = "Quantity must be 0 or more")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 }
