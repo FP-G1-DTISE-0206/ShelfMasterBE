@@ -6,6 +6,7 @@ import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.GetCartResponse;
 import com.DTISE.ShelfMasterBE.usecase.cart.AddToCartUsecase;
 import com.DTISE.ShelfMasterBE.usecase.cart.GetCartUsecase;
+import com.DTISE.ShelfMasterBE.usecase.cart.RemoveCartItemUsecase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +16,12 @@ public class CartController {
 
     private final AddToCartUsecase addToCartUsecase;
     private final GetCartUsecase getCartUsecase;
+    private final RemoveCartItemUsecase removeCartItemUsecase;
 
-    public CartController(AddToCartUsecase addToCartUsecase, GetCartUsecase getCartUsecase) {
+    public CartController(AddToCartUsecase addToCartUsecase, GetCartUsecase getCartUsecase, RemoveCartItemUsecase removeCartItemUsecase) {
         this.addToCartUsecase = addToCartUsecase;
         this.getCartUsecase = getCartUsecase;
+        this.removeCartItemUsecase = removeCartItemUsecase;
     }
 
 
@@ -32,6 +35,12 @@ public class CartController {
     public ResponseEntity<GetCartResponse> getCart(@PathVariable Long userId) {
         GetCartResponse response = getCartUsecase.execute(userId);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{userId}/{cartId}")
+    public ResponseEntity<String> removeCartItem(@PathVariable Long cartId) {
+        removeCartItemUsecase.execute(cartId);
+        return ResponseEntity.ok("Cart item removed successfully");
     }
 
 }

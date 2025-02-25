@@ -3,5 +3,6 @@ package com.DTISE.ShelfMasterBE.usecase.cart;
 import java.math.BigInteger;
 
 public interface RemoveCartItemUsecase {
-    void execute(BigInteger userId, BigInteger cartItemId);
+//    void execute(BigInteger cartItemId);
+    void execute(Long cartId);
 }
