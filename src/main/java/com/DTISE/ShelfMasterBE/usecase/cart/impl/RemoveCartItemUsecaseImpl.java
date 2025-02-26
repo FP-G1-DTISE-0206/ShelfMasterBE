@@ -33,9 +33,9 @@ public class RemoveCartItemUsecaseImpl implements RemoveCartItemUsecase {
         Cart cart = cartRepository.findById(BigInteger.valueOf(cartId))
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
-        if (!productRepository.existsById(cart.getProduct().getId())) {
-            throw new RuntimeException("Product still linked, cannot delete cart item.");
-        }
+//        if (!productRepository.existsById(cart.getProduct().getId())) {
+//            throw new RuntimeException("Product still linked, cannot delete cart item.");
+//        }
 
         cartRepository.delete(cart);
 
