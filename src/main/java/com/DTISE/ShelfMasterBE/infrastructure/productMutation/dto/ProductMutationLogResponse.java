@@ -7,5 +7,6 @@ import java.time.OffsetDateTime;
 public record ProductMutationLogResponse(
         Long id,
         MutationStatusEnum status,
-        OffsetDateTime createdAt
+        OffsetDateTime createdAt,
+        String reason
 ) {}

@@ -15,20 +15,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> getFirstByName(String name);
 
     @Query("""
-        SELECT DISTINCT p FROM Product p
-        LEFT JOIN FETCH p.stock s
+        SELECT p FROM Product p
         WHERE (:search IS NULL OR :search = ''
         OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')))
         AND (:categoryIds IS NULL OR (
             EXISTS (SELECT 1 FROM p.categories c WHERE c.id IN :categoryIds)
             AND SIZE(p.categories) > 0
         ))
-        AND (:warehouseId IS NULL OR s.warehouseId = :warehouseId OR s IS NULL)
     """)
     Page<Product> findAllBySearchAndOrWarehouseId(
             @Param("search") String search,
             @Param("categoryIds") List<Long> categoryIds,
-            Pageable pageable,
-            @Param("warehouseId") Long warehouseId
+            Pageable pageable
     );
 }

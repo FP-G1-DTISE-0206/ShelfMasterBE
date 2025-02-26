@@ -7,7 +7,9 @@ import com.DTISE.ShelfMasterBE.common.tools.PermissionUtils;
 import com.DTISE.ShelfMasterBE.entity.*;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.RejectionReasonRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.MutationStatusRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.ProductMutationLogReasonRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.ProductMutationLogRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.repository.ProductMutationRepository;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.RejectOrCancelProductMutationUseCase;
@@ -23,17 +25,20 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
     private final ProductMutationRepository productMutationRepository;
     private final ProductMutationLogRepository productMutationLogRepository;
     private final UserRepository userRepository;
+    private final ProductMutationLogReasonRepository reasonRepository;
 
     public RejectOrCancelProductMutationUseCaseImpl(
             MutationStatusRepository mutationStatusRepository,
             ProductMutationRepository productMutationRepository,
             ProductMutationLogRepository productMutationLogRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ProductMutationLogReasonRepository productMutationLogReasonRepository
     ) {
         this.mutationStatusRepository = mutationStatusRepository;
         this.productMutationRepository = productMutationRepository;
         this.productMutationLogRepository = productMutationLogRepository;
         this.userRepository = userRepository;
+        this.reasonRepository = productMutationLogReasonRepository;
     }
 
     @Override
@@ -56,7 +61,7 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
 
     @Override
     @Transactional
-    public Long rejectProductMutation(Long productMutationId) {
+    public Long rejectProductMutation(Long productMutationId, RejectionReasonRequest req) {
         Optional<ProductMutation> existingMutation = productMutationRepository.findById(productMutationId);
         if(existingMutation.isEmpty()) throw new RuntimeException("No product mutation with ID: " + productMutationId);
         ProductMutation mutationToReject = existingMutation.get();
@@ -67,7 +72,7 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
 
         process(user, mutationToReject, "reject");
 
-        createMutationLog(mutationToReject, MutationStatusEnum.REJECTED);
+        createReason(createMutationLog(mutationToReject, MutationStatusEnum.REJECTED), req);
 
         return mutationToReject.getId();
     }
@@ -89,7 +94,7 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
         PermissionUtils.isAdminOfCurrentWarehouse(user, warehouseId);
     }
 
-    private void createMutationLog(ProductMutation mutation, MutationStatusEnum statusEnum) {
+    private ProductMutationLog createMutationLog(ProductMutation mutation, MutationStatusEnum statusEnum) {
         MutationStatus status = mutationStatusRepository
                 .findFirstByName(statusEnum)
                 .orElseThrow(() -> new MutationStatusNotFoundException("Status not found."));
@@ -97,6 +102,13 @@ public class RejectOrCancelProductMutationUseCaseImpl implements RejectOrCancelP
         ProductMutationLog log = new ProductMutationLog();
         log.setProductMutationId(mutation.getId());
         log.setMutationStatus(status);
-        productMutationLogRepository.save(log);
+        return productMutationLogRepository.save(log);
+    }
+
+    private void createReason(ProductMutationLog log, RejectionReasonRequest req) {
+        ProductMutationLogReason reason = new ProductMutationLogReason();
+        reason.setProductMutationLogId(log.getId());
+        reason.setReason(req.getReason());
+        reasonRepository.save(reason);
     }
 }

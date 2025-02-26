@@ -12,27 +12,22 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_mutation_log")
+@Table(name = "product_mutation_log_reason")
 @SQLRestriction("deleted_at IS NULL")
-public class ProductMutationLog {
+public class ProductMutationLogReason {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_mutation_log_id_gen")
-    @SequenceGenerator(name = "product_mutation_log_id_gen", sequenceName = "product_mutation_log_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_mutation_log_reason_id_gen")
+    @SequenceGenerator(name = "product_mutation_log_reason_id_gen", sequenceName = "product_mutation_log_reason_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @NotNull
-    @Column(name = "product_mutation_id", nullable = false)
-    private Long productMutationId;
+    @Column(name = "product_mutation_log_id", nullable = false)
+    private Long productMutationLogId;
 
     @NotNull
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "mutation_status_id", referencedColumnName = "id", nullable = false)
-    private MutationStatus mutationStatus;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "id", referencedColumnName = "product_mutation_log_id")
-    private ProductMutationLogReason reason;
+    @Column(name = "reason")
+    private String reason;
 
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")

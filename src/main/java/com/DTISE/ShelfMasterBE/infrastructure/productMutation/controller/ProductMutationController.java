@@ -5,9 +5,9 @@ import com.DTISE.ShelfMasterBE.common.tools.Pagination;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AddProductStockRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.AutoMutationRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.InternalProductMutationRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.RejectionReasonRequest;
 import com.DTISE.ShelfMasterBE.usecase.productMutation.*;
 import com.DTISE.ShelfMasterBE.usecase.warehouse.GetAssignedWarehouseUseCase;
-import com.DTISE.ShelfMasterBE.usecase.warehouse.impl.GetAssignedWarehouseUseCaseImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -100,10 +100,13 @@ public class ProductMutationController {
     }
 
     @PutMapping("/reject/{id}")
-    public ResponseEntity<?> rejectMutation(@PathVariable Long id) {
+    public ResponseEntity<?> rejectMutation(
+            @RequestBody @Validated RejectionReasonRequest req,
+            @PathVariable Long id
+    ) {
         return ApiResponse.successfulResponse(
                 "Internal mutation rejected successfully",
-                rejectOrCancelProductMutationUseCase.rejectProductMutation(id)
+                rejectOrCancelProductMutationUseCase.rejectProductMutation(id, req)
         );
     }
 

@@ -241,6 +241,22 @@ CREATE TABLE "public"."product_mutation_log" (
     WITH ( OIDS=FALSE );
 
 -- -----------------------------------
+-- "public"."product_mutation_log_reason"
+-- -----------------------------------
+
+DROP TABLE IF EXISTS "public"."product_mutation_log_reason" CASCADE;
+CREATE TABLE "public"."product_mutation_log_reason" (
+                                                 "id" BIGSERIAL NOT NULL,
+                                                 "product_mutation_log_id" BIGINT NOT NULL,
+                                    			 "reason" CHARACTER VARYING(255) NOT NULL,
+                                                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                 "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                                 PRIMARY KEY ( "id" )
+)
+    WITH ( OIDS=FALSE );
+
+-- -----------------------------------
 -- "public"."product_mutation_order"
 -- -----------------------------------
 

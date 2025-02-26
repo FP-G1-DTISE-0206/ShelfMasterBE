@@ -13,7 +13,8 @@ public interface ProductMutationLogRepository extends JpaRepository<ProductMutat
         SELECT new com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.ProductMutationLogResponse(
            pml.id,
            pml.mutationStatus.name,
-           pml.createdAt
+           pml.createdAt,
+           COALESCE(pml.reason.reason, '')
        )
        FROM ProductMutationLog pml
        WHERE pml.productMutationId = :productMutationId
