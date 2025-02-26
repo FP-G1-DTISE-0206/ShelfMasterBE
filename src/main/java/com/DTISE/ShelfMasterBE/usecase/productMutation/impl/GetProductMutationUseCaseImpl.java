@@ -29,10 +29,11 @@ public class GetProductMutationUseCaseImpl implements GetProductMutationUseCase 
 
     @Override
     @Transactional
-    public Page<ProductMutationResponse> getProductMutations(Pageable pageable, String search, Long warehouseId) {
+    public Page<ProductMutationResponse> getProductMutations(
+            Pageable pageable, String search, Long mutationTypeId,  Long warehouseId) {
         validateUserAccess(warehouseId);
         return productMutationRepository.getAllBySearchAndWarehouseId(
-                        search, pageable, warehouseId,
+                        search, pageable, mutationTypeId, warehouseId,
                         MutationEntityType.WAREHOUSE);
     }
 

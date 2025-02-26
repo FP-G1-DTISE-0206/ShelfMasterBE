@@ -104,7 +104,7 @@ public class ProductController {
                 .sum();
 
         int totalItems = cartRequest.getCartItems().stream()
-                .mapToInt(item -> item.getQuantity())
+                .mapToInt(CartRequest.CartItemDTO::getQuantity)
                 .sum();
 
         Map<String, Object> response = new HashMap<>();
