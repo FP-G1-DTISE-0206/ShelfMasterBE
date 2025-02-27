@@ -35,6 +35,7 @@ public class GetDetailLogsUseCaseImpl implements GetDetailLogsUseCase {
         ProductMutation mutation = mutationRepository.findById(productMutationId)
                 .orElseThrow(() -> new RuntimeException("Mutation not found: " + productMutationId));
         validateUserAccess(mutation);
+        List<ProductMutationLogResponse> xd = productMutationLogRepository.findAllByProductMutationId(productMutationId);
         return productMutationLogRepository.findAllByProductMutationId(productMutationId);
     }
 

@@ -30,10 +30,6 @@ public class ProductMutationLog {
     @JoinColumn(name = "mutation_status_id", referencedColumnName = "id", nullable = false)
     private MutationStatus mutationStatus;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "id", referencedColumnName = "product_mutation_log_id")
-    private ProductMutationLogReason reason;
-
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at", nullable = false)
