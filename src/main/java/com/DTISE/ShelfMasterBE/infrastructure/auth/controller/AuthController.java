@@ -74,19 +74,19 @@ public class AuthController {
         return ApiResponse.successfulResponse("Refresh successful", tokenRefreshUsecase.refreshAccessToken(token));
     }
 
-//    @PostMapping("/change_password")
-//    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest req) {
-//        String email = Claims.getEmailFromJwt();
-//        boolean isPasswordCorrect = checkPasswordUsecase.checkPassword(email, req.getOldPassword());
-//        if (!isPasswordCorrect) {
-//            return ApiResponse.failedResponse("Old password is incorrect");
-//        }
-//        boolean result = changePasswordUsecase.changePassword(req, email);
-//        if (!result) {
-//            return ApiResponse.failedResponse("Failed to change password");
-//        }
-//        return ApiResponse.successfulResponse("Password changed successfully");
-//    }
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest req) {
+        String email = Claims.getEmailFromJwt();
+        boolean isPasswordCorrect = checkPasswordUsecase.checkPassword(email, req.getOldPassword());
+        if (!isPasswordCorrect) {
+            return ApiResponse.failedResponse("Old password is incorrect");
+        }
+        boolean result = changePasswordUsecase.changePassword(req, email);
+        if (!result) {
+            return ApiResponse.failedResponse("Failed to change password");
+        }
+        return ApiResponse.successfulResponse("Password changed successfully");
+    }
 
     @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> requestBody) {
