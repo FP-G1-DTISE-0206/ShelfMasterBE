@@ -42,6 +42,7 @@ public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
         return productRepository.findById(id)
                 .map(existingProduct -> {
                     checkProductNameAvailable(id, req);
+                    checkProductSkuAvailable(id, req);
                     existingProduct.setName(req.getName());
                     existingProduct.setSku(req.getSku());
                     existingProduct.setDescription(req.getDescription());
@@ -61,6 +62,13 @@ public class UpdateProductUseCaseImpl implements UpdateProductUseCase {
         Optional<Product> existingProduct = productRepository.getFirstByName(req.getName());
         if (existingProduct.isPresent() && !existingProduct.get().getId().equals(req.getId())) {
             throw new DuplicateProductNameException("Product with this name already exists");
+        }
+    }
+
+    private void checkProductSkuAvailable(Long id, UpdateProductRequest req) {
+        Optional<Product> existingProduct = productRepository.getFirstBySku(req.getSku());
+        if (existingProduct.isPresent() && !existingProduct.get().getId().equals(req.getId())) {
+            throw new DuplicateProductNameException("Product with this SKU already exists");
         }
     }
 

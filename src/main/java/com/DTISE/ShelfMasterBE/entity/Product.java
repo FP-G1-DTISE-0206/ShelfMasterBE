@@ -30,7 +30,7 @@ public class Product {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Size(max = 100)
+    @Size(max = 255)
     @NotNull
     @Column(name = "sku", nullable = false)
     private String sku;

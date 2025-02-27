@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    Boolean existsBySku(String sku);
     Boolean existsByName(String name);
+    Optional<Product> getFirstBySku(String sku);
     Optional<Product> getFirstByName(String name);
 
     @Query("""

@@ -42,6 +42,9 @@ public class CreateProductUseCaseImpl implements CreateProductUseCase {
         if (productRepository.existsByName(req.getName())) {
             throw new DuplicateProductNameException("Product name must be unique.");
         }
+        if (productRepository.existsBySku(req.getSku())) {
+            throw new DuplicateProductNameException("Product SKU must be unique.");
+        }
         Product newProduct = productRepository.save(addCategory(req.toEntity(), req));
         addProductImages(newProduct.getId(), req.getImages());
         return mapCreatedProductResponse(newProduct);
