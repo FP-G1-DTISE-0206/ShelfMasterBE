@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    Boolean existsBySku(String sku);
     Boolean existsByName(String name);
+    Optional<Product> getFirstBySku(String sku);
     Optional<Product> getFirstByName(String name);
 
     @Query("""
@@ -22,14 +24,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             EXISTS (SELECT 1 FROM p.categories c WHERE c.id IN :categoryIds)
             AND SIZE(p.categories) > 0
         ))
-        AND (:warehouseId IS NULL OR (
-            EXISTS (SELECT 1 FROM p.stock s WHERE s.warehouseId = :warehouseId)
-        ))
     """)
     Page<Product> findAllBySearchAndOrWarehouseId(
             @Param("search") String search,
             @Param("categoryIds") List<Long> categoryIds,
-            Pageable pageable,
-            @Param("warehouseId") Long warehouseId
+            Pageable pageable
     );
 }

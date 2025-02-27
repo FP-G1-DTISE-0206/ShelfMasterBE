@@ -37,8 +37,8 @@ public class GetProductsUseCaseImpl implements GetProductsUseCase {
             List<Long> categories,
             Long warehouseId) {
         validateUserAccess(warehouseId);
-        return productRepository.findAllBySearchAndOrWarehouseId(search, categories, pageable, warehouseId)
-                .map(ProductMapper::mapGetProductResponse);
+        return productRepository.findAllBySearchAndOrWarehouseId(search, categories, pageable)
+                .map(product -> ProductMapper.mapGetProductResponse(product, warehouseId));
     }
 
     @Override

@@ -13,10 +13,12 @@ public interface ProductMutationLogRepository extends JpaRepository<ProductMutat
         SELECT new com.DTISE.ShelfMasterBE.infrastructure.productMutation.dto.ProductMutationLogResponse(
            pml.id,
            pml.mutationStatus.name,
-           pml.createdAt
-       )
-       FROM ProductMutationLog pml
-       WHERE pml.productMutationId = :productMutationId
+           pml.createdAt,
+           COALESCE(r.reason, '')
+        )
+        FROM ProductMutationLog pml
+        LEFT JOIN ProductMutationLogReason r on r.productMutationLogId = pml.id
+        WHERE pml.productMutationId = :productMutationId
     """)
     List<ProductMutationLogResponse> findAllByProductMutationId(@Param("productMutationId") Long productMutationId);
 }

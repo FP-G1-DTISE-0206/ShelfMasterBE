@@ -23,19 +23,19 @@ INSERT INTO public.category ("name") VALUES
 	 ('Drink');
 
 INSERT INTO public.product ("name",sku,description,price,weight) VALUES
-	 ('Dua Lombok Seblak 60 g','-','Dua Lombok Seblak 60 g adalah seblak lezat yang cocok untuk dimakan sebagaii makanan ringan maupun dicampur dengan makanan berkuah seperti soto dan baso. Rasanya yang pedas dan gurih, pastinya akan bikin ketagihan.',9200.0,65.0),
-	 ('Bean Spot Roti Keju Susu','-','Roti Keju Susu adalah produk roti siap makan yang terbuat dari tepung pilihan dengan kualitas premium terbaik yang kemudian diproses secara modern sehingga mampu menghasilkan produk roti susu yang sangat lembut di dalamnya, sehingga sangat enak untuk di makan. Dilengkapi dengan gurihnya krim keju sebagai isian yang membuat Roti ini semakin enak untuk dinikmati. Krim keju yang meleleh di mulut mampu memberikan kenikmatan tiada tara.',7000.0,15.0);
+	 ('Dua Lombok Seblak 60 g','SNACK-CHC-101','Dua Lombok Seblak 60 g adalah seblak lezat yang cocok untuk dimakan sebagaii makanan ringan maupun dicampur dengan makanan berkuah seperti soto dan baso. Rasanya yang pedas dan gurih, pastinya akan bikin ketagihan.',9200.0,60.0),
+	 ('Bean Spot Roti Keju Susu','BREAD-WSB-001','Roti Keju Susu adalah produk roti siap makan yang terbuat dari tepung pilihan dengan kualitas premium terbaik yang kemudian diproses secara modern sehingga mampu menghasilkan produk roti susu yang sangat lembut di dalamnya, sehingga sangat enak untuk di makan. Dilengkapi dengan gurihnya krim keju sebagai isian yang membuat Roti ini semakin enak untuk dinikmati. Krim keju yang meleleh di mulut mampu memberikan kenikmatan tiada tara.',7000.0,400.0);
 
 INSERT INTO public.product_images (product_id,image_url) VALUES
-	 (1,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2F8f1b5c652928482b91f28bfb195b14b1'),
-	 (2,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2F7287664dd472424c95ea8156efef6737'),
-	 (2,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2Fef3b1d0a94974697a75ad54fac68ff1b');
+	 (1,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2F7287664dd472424c95ea8156efef6737'),
+	 (1,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2Fef3b1d0a94974697a75ad54fac68ff1b');
+     (2,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2F8f1b5c652928482b91f28bfb195b14b1'),
 
 INSERT INTO public.product_categories (product_id,category_id) VALUES
 	 (1,1),
 	 (2,1),
-	 (1,2),
-	 (2,3);
+	 (1,3),
+	 (2,2);
 
 INSERT INTO public.mutation_status (name) VALUES
 	 ('PENDING'),
@@ -48,3 +48,7 @@ INSERT INTO public.mutation_type (origin_type, destination_type) VALUES
 	 ('WAREHOUSE', 'WAREHOUSE'),
 	 ('WAREHOUSE', 'USER'),
 	 ('USER', 'WAREHOUSE');
+
+INSERT INTO public.vendor (name) VALUES
+      	 ('Supply Flow'),
+      	 ('Bulk Buy')
