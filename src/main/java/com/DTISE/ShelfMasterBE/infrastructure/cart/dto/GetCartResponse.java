@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -15,4 +16,6 @@ public class GetCartResponse {
 
     private Long userId;
     private List<CartItemResponse> cartItems;
+    private Integer totalQuantity;
+    private BigDecimal totalPrice;
 }

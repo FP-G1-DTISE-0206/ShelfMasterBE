@@ -10,6 +10,7 @@ import com.DTISE.ShelfMasterBE.usecase.cart.GetCartUsecase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,8 +46,12 @@ public class GetCartUsecaseImpl implements GetCartUsecase {
                 )
         ).collect(Collectors.toList());
 
+        int totalQuantity = cartItems.stream().mapToInt(Cart::getQuantity).sum();
 
-        return new GetCartResponse(user.getId(), items);
+        BigDecimal totalPrice = cartItems.stream().map(cart -> cart.getProduct().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+        return new GetCartResponse(user.getId(), items, totalQuantity, totalPrice);
     }
 
 }
