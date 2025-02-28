@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/promotion")
-@PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
+
 public class PromotionController {
     private final CreatePromotionUsecase createPromotionUsecase;
     private final GetPromotionUsecase getPromotionUsecase;
@@ -29,6 +29,7 @@ public class PromotionController {
     }
 
     @GetMapping()
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     public ResponseEntity<?> getPromotions(@RequestParam int start,
                                            @RequestParam int length,
                                            @RequestParam(required = false) String search,
@@ -49,21 +50,25 @@ public class PromotionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     public ResponseEntity<?> getPromotion(@PathVariable Long id) {
         return ApiResponse.successfulResponse("Promotion retrieved successfully", getPromotionUsecase.getPromotion(id));
     }
 
     @PostMapping()
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     public ResponseEntity<?> createPromotion(@RequestBody @Validated PromotionRequest req) {
         return ApiResponse.successfulResponse("Promotion created successfully", createPromotionUsecase.createPromotion(req));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     public ResponseEntity<?> updatePromotion(@RequestBody @Validated PromotionRequest req, @PathVariable Long id) {
         return ApiResponse.successfulResponse("Promotion updated successfully", updatePromotionUsecase.updatePromotion(req, id));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_SUPER_ADMIN')")
     public ResponseEntity<?> deletePromotion(@PathVariable Long id) {
         deletePromotionUsecase.deletePromotion(id);
         return ApiResponse.successfulResponse("Promotion deleted successfully");
