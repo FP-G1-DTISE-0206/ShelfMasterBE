@@ -58,11 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/setup-account").permitAll()
                         .requestMatchers("/api/v1/auth/forgot-password").permitAll()
                         .requestMatchers("/api/v1/auth/setup-password").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/event").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/event/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/review/average_stars").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/review").permitAll()
-                        //  Define rest of the routes to be private
+                        .requestMatchers(HttpMethod.GET, "/api/v1/promotion/simple").permitAll()
                         .requestMatchers("/api/v1/product/calculate-total").authenticated()
                         .anyRequest().authenticated()
                 )

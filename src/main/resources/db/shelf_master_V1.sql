@@ -109,12 +109,12 @@ CREATE TABLE "public"."warehouse" (
 
 DROP TABLE IF EXISTS "public"."vendor" CASCADE;
 CREATE TABLE "public"."vendor" (
-                                      "id" BIGSERIAL NOT NULL,
-                                      "name" CHARACTER VARYING(255) NOT NULL,
-                                      "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                      "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                      "deleted_at" TIMESTAMP WITH TIME ZONE,
-                                      PRIMARY KEY ( "id" )
+                                   "id" BIGSERIAL NOT NULL,
+                                   "name" CHARACTER VARYING(255) NOT NULL,
+                                   "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                   "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                   "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                   PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -208,19 +208,19 @@ CREATE TABLE "public"."product_categories" (
 
 DROP TABLE IF EXISTS "public"."product_mutation" CASCADE;
 CREATE TABLE "public"."product_mutation" (
-                                                  "id" BIGSERIAL NOT NULL,
-												  "mutation_type_id" BIGINT NOT NULL,
-                                                  "origin_id" BIGINT NOT NULL,
-                                                  "destination_id" BIGINT NOT NULL,
-                                                  "product_id" BIGINT NOT NULL,
-                                                  "quantity" BIGINT NOT NULL DEFAULT 0,
-                                                  "requested_by" BIGINT NOT NULL,
-                                                  "processed_by" BIGINT,
-                                                  "is_approved" BOOLEAN NOT NULL DEFAULT false,
-                                                  "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                  "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                  "deleted_at" TIMESTAMP WITH TIME ZONE,
-                                                  PRIMARY KEY ( "id" )
+                                             "id" BIGSERIAL NOT NULL,
+                                             "mutation_type_id" BIGINT NOT NULL,
+                                             "origin_id" BIGINT NOT NULL,
+                                             "destination_id" BIGINT NOT NULL,
+                                             "product_id" BIGINT NOT NULL,
+                                             "quantity" BIGINT NOT NULL DEFAULT 0,
+                                             "requested_by" BIGINT NOT NULL,
+                                             "processed_by" BIGINT,
+                                             "is_approved" BOOLEAN NOT NULL DEFAULT false,
+                                             "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                             "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                             "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                             PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -246,13 +246,13 @@ CREATE TABLE "public"."product_mutation_log" (
 
 DROP TABLE IF EXISTS "public"."product_mutation_log_reason" CASCADE;
 CREATE TABLE "public"."product_mutation_log_reason" (
-                                                 "id" BIGSERIAL NOT NULL,
-                                                 "product_mutation_log_id" BIGINT NOT NULL,
-                                    			 "reason" CHARACTER VARYING(255) NOT NULL,
-                                                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                                                 PRIMARY KEY ( "id" )
+                                                        "id" BIGSERIAL NOT NULL,
+                                                        "product_mutation_log_id" BIGINT NOT NULL,
+                                                        "reason" CHARACTER VARYING(255) NOT NULL,
+                                                        "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                        "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                        "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                                        PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -262,14 +262,14 @@ CREATE TABLE "public"."product_mutation_log_reason" (
 
 DROP TABLE IF EXISTS "public"."product_mutation_order" CASCADE;
 CREATE TABLE "public"."product_mutation_order" (
-                                                 "id" BIGSERIAL NOT NULL,
-                                                 "order_id" BIGINT NOT NULL,
-                                                 "ordered_product_mutation_id" BIGINT NOT NULL,
-                                                 "returned_product_mutation_id" BIGINT,
-                                                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                                                 PRIMARY KEY ( "id" )
+                                                   "id" BIGSERIAL NOT NULL,
+                                                   "order_id" BIGINT NOT NULL,
+                                                   "ordered_product_mutation_id" BIGINT NOT NULL,
+                                                   "returned_product_mutation_id" BIGINT,
+                                                   "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                   "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                   "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                                   PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -294,13 +294,13 @@ CREATE TABLE "public"."mutation_status" (
 
 DROP TABLE IF EXISTS "public"."mutation_type" CASCADE;
 CREATE TABLE "public"."mutation_type" (
-                                            "id" BIGSERIAL NOT NULL,
-                                            "origin_type" CHARACTER VARYING(30) NOT NULL,
-                                            "destination_type" CHARACTER VARYING(30) NOT NULL,
-                                            "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                            "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                            "deleted_at" TIMESTAMP WITH TIME ZONE,
-                                            PRIMARY KEY ( "id" )
+                                          "id" BIGSERIAL NOT NULL,
+                                          "origin_type" CHARACTER VARYING(30) NOT NULL,
+                                          "destination_type" CHARACTER VARYING(30) NOT NULL,
+                                          "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                          "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                          "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                          PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -389,89 +389,128 @@ CREATE TABLE "public"."warehouse_admins" (
     WITH ( OIDS=FALSE );
 
 -- -----------------------------------
+-- "public"."promotion"
+-- -----------------------------------
+
+DROP TABLE IF EXISTS "public"."promotion" CASCADE;
+CREATE TABLE "public"."promotion" (
+                                      "id" BIGSERIAL NOT NULL,
+                                      "title" CHARACTER VARYING(255) NOT NULL,
+                                      "description" TEXT,
+                                      "image_url" TEXT NOT NULL,
+                                      "product_url" TEXT,
+                                      "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                      PRIMARY KEY ( "id" )
+)
+    WITH ( OIDS=FALSE );
+
+-- -----------------------------------
 -- Foreign Keys
 -- -----------------------------------
 
 ALTER TABLE "public"."user_address"
     ADD CONSTRAINT "user_address_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."user_roles"
     ADD CONSTRAINT "user_roles_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."user_roles"
     ADD CONSTRAINT "user_roles_role_id_fkey" FOREIGN KEY ( "role_id" ) REFERENCES "public"."role" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_stock"
     ADD CONSTRAINT "product_stock_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_stock"
     ADD CONSTRAINT "product_stock_warehouse_id_fkey" FOREIGN KEY ( "warehouse_id" ) REFERENCES "public"."warehouse" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_images"
     ADD CONSTRAINT "product_images_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_categories"
     ADD CONSTRAINT "product_categories_category_id_fkey" FOREIGN KEY ( "category_id" ) REFERENCES "public"."category" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_categories"
     ADD CONSTRAINT "product_categories_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_mutation"
     ADD CONSTRAINT "product_mutation_mutation_type_id_fkey" FOREIGN KEY ( "mutation_type_id" ) REFERENCES "public"."mutation_type" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_mutation"
     ADD CONSTRAINT "product_mutation_pic_id_fkey" FOREIGN KEY ( "requested_by" ) REFERENCES "public"."user" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_mutation"
     ADD CONSTRAINT "product_mutation_processed_by_fkey" FOREIGN KEY ( "processed_by" ) REFERENCES "public"."user" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_mutation"
     ADD CONSTRAINT "product_mutation_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_mutation_log"
     ADD CONSTRAINT "product_mutation_log_product_mutation_id_fkey" FOREIGN KEY ( "product_mutation_id" ) REFERENCES "public"."product_mutation" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."product_mutation_log"
     ADD CONSTRAINT "product_mutation_log_mutation_status_id_fkey" FOREIGN KEY ( "mutation_status_id" ) REFERENCES "public"."mutation_status" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."order"
     ADD CONSTRAINT "order_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."order_items"
     ADD CONSTRAINT "order_items_order_id_fkey" FOREIGN KEY ( "order_id" ) REFERENCES "public"."order" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."order_items"
     ADD CONSTRAINT "order_items_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."order_log"
     ADD CONSTRAINT "order_log_order_id_fkey" FOREIGN KEY ( "order_id" ) REFERENCES "public"."order" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."order_log"
     ADD CONSTRAINT "order_log_order_status_id_fkey" FOREIGN KEY ( "order_status_id" ) REFERENCES "public"."order_status" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."warehouse_admins"
     ADD CONSTRAINT "warehouse_admins_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."warehouse_admins"
     ADD CONSTRAINT "warehouse_admins_warehouse_id_fkey" FOREIGN KEY ( "warehouse_id" ) REFERENCES "public"."warehouse" ( "id" )
-        ON DELETE NO ACTION ON UPDATE NO ACTION;
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
