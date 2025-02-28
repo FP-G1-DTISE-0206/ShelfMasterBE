@@ -28,8 +28,8 @@ INSERT INTO public.product ("name",sku,description,price,weight) VALUES
 
 INSERT INTO public.product_images (product_id,image_url) VALUES
 	 (1,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2F7287664dd472424c95ea8156efef6737'),
-	 (1,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2Fef3b1d0a94974697a75ad54fac68ff1b');
-     (2,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2F8f1b5c652928482b91f28bfb195b14b1'),
+	 (1,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2Fef3b1d0a94974697a75ad54fac68ff1b'),
+     (2,'https://cdn.builder.io/api/v1/image/assets%2F30e3604c9ea247809c03511e4a9c5f3f%2F8f1b5c652928482b91f28bfb195b14b1');
 
 INSERT INTO public.product_categories (product_id,category_id) VALUES
 	 (1,1),
