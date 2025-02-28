@@ -25,7 +25,7 @@ public class DeleteWarehouseUsecaseImpl implements DeleteWarehouseUsecase {
                     existingWarehouse.setDeletedAt(OffsetDateTime.now());
                     return warehouseRepository.save(existingWarehouse);
                 })
-                .orElseThrow(() -> new DataNotFoundException("There's no product with ID: " + id));
+                .orElseThrow(() -> new DataNotFoundException("There's no warehouse with ID: " + id));
     }
 
 }

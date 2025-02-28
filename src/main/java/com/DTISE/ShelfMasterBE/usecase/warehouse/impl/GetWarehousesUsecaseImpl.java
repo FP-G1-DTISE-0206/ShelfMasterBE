@@ -1,6 +1,7 @@
 package com.DTISE.ShelfMasterBE.usecase.warehouse.impl;
 
 
+import com.DTISE.ShelfMasterBE.common.exceptions.DataNotFoundException;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseFullResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.repository.WarehouseRepository;
@@ -26,6 +27,6 @@ public class GetWarehousesUsecaseImpl implements GetWarehousesUsecase {
 
     @Override
     public WarehouseFullResponse getWarehouse(Long warehouseId) {
-        return warehouseRepository.findById(warehouseId).map(WarehouseFullResponse::new).orElse(null);
+        return warehouseRepository.findById(warehouseId).map(WarehouseFullResponse::new).orElseThrow( () -> new DataNotFoundException("There's no warehouse with ID: " + warehouseId));
     }
 }
