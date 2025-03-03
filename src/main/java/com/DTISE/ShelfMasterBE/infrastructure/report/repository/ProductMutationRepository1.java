@@ -50,7 +50,8 @@ public interface ProductMutationRepository1 extends JpaRepository<ProductMutatio
                WHEN pm.mutationType.destinationType = :userEnum THEN 'order'
                WHEN pm.mutationType.originType = :vendorEnum THEN 'restock'
                ELSE 'unknown'
-           END
+           END,
+           pm.updatedAt
        )
        FROM ProductMutation pm
            LEFT JOIN ProductMutationOrder pmo ON pm.id = pmo.orderedProductMutationId
@@ -115,7 +116,8 @@ public interface ProductMutationRepository1 extends JpaRepository<ProductMutatio
                WHEN pm.mutationType.destinationType = :userEnum THEN 'order'
                WHEN pm.mutationType.originType = :vendorEnum THEN 'restock'
                ELSE 'unknown'
-           END
+           END,
+           pm.updatedAt
        )
        FROM ProductMutation pm
            LEFT JOIN ProductMutationOrder pmo ON pm.id = pmo.orderedProductMutationId

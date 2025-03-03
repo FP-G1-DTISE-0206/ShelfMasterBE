@@ -1,5 +1,7 @@
 package com.DTISE.ShelfMasterBE.infrastructure.report.dto;
 
+import java.time.OffsetDateTime;
+
 public record StockReportResponse(
         Long id,
         String originName,
@@ -10,5 +12,6 @@ public record StockReportResponse(
         Long absQuantity,
         String requesterName,
         String processorName,
-        String remark
+        String remark,
+        OffsetDateTime processedAt
 ) {}

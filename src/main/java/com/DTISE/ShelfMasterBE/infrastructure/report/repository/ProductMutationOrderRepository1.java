@@ -123,6 +123,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
         SELECT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.PopularProductResponse(
             pm.product.id,
             pm.product.name,
+            pm.product.price,
             pm.quantity
        )
        FROM ProductMutationOrder pmo
@@ -143,7 +144,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
 
     @Query("""
        SELECT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.GraphResponse(
-           oi.orderId,
+           TO_CHAR(oi.createdAt, 'IYYY-IW'),
            SUM(COALESCE(oi.totalPrice, 0))
        )
        FROM ProductMutationOrder pmo
@@ -154,7 +155,8 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
            AND pm.mutationType.destinationType = :destinationType
            AND oi.createdAt >= :startOfThisMonth
-       GROUP BY oi.orderId
+       GROUP BY TO_CHAR(oi.createdAt, 'IYYY-IW')
+       ORDER BY MIN(oi.createdAt)
     """)
     List<GraphResponse> getSalesGraphThisMonth(
             @Param("originType") MutationEntityType originType,
@@ -164,7 +166,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
 
     @Query("""
        SELECT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.GraphResponse(
-           oi.orderId,
+           TO_CHAR(oi.createdAt, 'Month'),
            SUM(COALESCE(oi.totalPrice, 0))
        )
        FROM ProductMutationOrder pmo
@@ -175,7 +177,8 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
            AND pm.mutationType.destinationType = :destinationType
            AND YEAR(oi.createdAt) >= :thisYear
-       GROUP BY oi.orderId
+       GROUP BY TO_CHAR(oi.createdAt, 'Month')
+       ORDER BY MIN(oi.createdAt)
     """)
     List<GraphResponse> getSalesGraphThisYear(
             @Param("originType") MutationEntityType originType,

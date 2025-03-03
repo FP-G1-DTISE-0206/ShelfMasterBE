@@ -15,7 +15,7 @@ public class DateConverter {
     }
 
     public static OffsetDateTime getStartOfDay(LocalDate date) {
-        return date.atStartOfDay(ZoneOffset.UTC).toOffsetDateTime();
+        return date.atStartOfDay().atOffset(ZoneOffset.UTC);
     }
 
     public static OffsetDateTime getEndOfDay(LocalDate date) {
