@@ -184,7 +184,8 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
             @Param("warehouseId") Long warehouseId);
 
     @Query("""
-       SELECT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.SalesReportResponse(
+       SELECT DISTINCT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.SalesReportResponse(
+            pmo.id,
             oi.orderId,
             p.id,
             p.name,
@@ -209,7 +210,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
            AND pm.mutationType.destinationType = :destinationType
-       GROUP BY oi.orderId, p.id, p.name, oi.quantity, oi.totalPrice, pmo.createdAt
+       GROUP BY pmo.id, oi.orderId, p.id, p.name, c.name, oi.quantity, oi.totalPrice, pmo.createdAt
     """)
     Page<SalesReportResponse> getSalesReportPreview(
             Pageable pageable,
@@ -222,7 +223,8 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
             @Param("warehouseId") Long warehouseId);
 
     @Query("""
-       SELECT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.SalesReportResponse(
+       SELECT DISTINCT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.SalesReportResponse(
+            pmo.id,
             oi.orderId,
             p.id,
             p.name,
@@ -247,7 +249,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
            AND pm.mutationType.destinationType = :destinationType
-       GROUP BY oi.orderId, p.id, p.name, oi.quantity, oi.totalPrice, pmo.createdAt
+       GROUP BY pmo.id, oi.orderId, p.id, p.name, c.name, oi.quantity, oi.totalPrice, pmo.createdAt
     """)
     List<SalesReportResponse> getSalesReport(
             @Param("originType") MutationEntityType originType,

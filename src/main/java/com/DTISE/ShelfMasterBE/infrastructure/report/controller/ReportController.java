@@ -7,6 +7,7 @@ import com.DTISE.ShelfMasterBE.infrastructure.report.dto.StockReportRequest;
 import com.DTISE.ShelfMasterBE.usecase.report.GetDashboardDataUseCase;
 import com.DTISE.ShelfMasterBE.usecase.report.GetSalesReportUseCase;
 import com.DTISE.ShelfMasterBE.usecase.report.GetStockReportUseCase;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -34,10 +35,7 @@ public class ReportController {
 
     @GetMapping("/cards")
     public ResponseEntity<?> getSalesCardInfos(
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate date,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate date,
             @RequestParam(required = false) Long id
     ) {
         return ApiResponse.successfulResponse(
@@ -48,10 +46,7 @@ public class ReportController {
 
     @GetMapping("/popular")
     public ResponseEntity<?> getThisMonthPopularProducts(
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate date,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate date,
             @RequestParam(required = false) Long id
     ) {
         return ApiResponse.successfulResponse(
@@ -62,10 +57,7 @@ public class ReportController {
 
     @GetMapping("/month-graph")
     public ResponseEntity<?> getSalesGraphThisMonth(
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate date,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate date,
             @RequestParam(required = false) Long id
     ) {
         return ApiResponse.successfulResponse(
@@ -76,10 +68,7 @@ public class ReportController {
 
     @GetMapping("/year-graph")
     public ResponseEntity<?> getSalesGraph(
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate date,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate date,
             @RequestParam(required = false) Long id
     ) {
         return ApiResponse.successfulResponse(
@@ -94,14 +83,8 @@ public class ReportController {
             @RequestParam(defaultValue = "10") Integer length,
             @RequestParam(defaultValue = "id") String field,
             @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate startDate,
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate endDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate,
             @RequestParam(required = false) Long productId,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long warehouseId
@@ -125,14 +108,8 @@ public class ReportController {
             @RequestParam(defaultValue = "10") Integer length,
             @RequestParam(defaultValue = "id") String field,
             @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate startDate,
-            @RequestParam(
-                    value = "date",
-                    defaultValue = "#{T(java.time.LocalDate).now()}"
-            ) LocalDate endDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate,
             @RequestParam(required = false) Long productId,
             @RequestParam(required = false) Long warehouseId
     ) {

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 public record SalesReportResponse(
+        Long mutationOrderId,
         Long orderId,
         Long productId,
         String productName,
