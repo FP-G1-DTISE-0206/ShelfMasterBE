@@ -1,5 +1,7 @@
 package com.DTISE.ShelfMasterBE.infrastructure.cart.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,8 +13,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItemResponse {
-    private BigInteger cartId;
-    private BigInteger productId;
+    private Long cartId;
+    private Long productId;
     private String productName;
     private Integer quantity;
     private Boolean isProcessed;

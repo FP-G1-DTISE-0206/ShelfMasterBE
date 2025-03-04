@@ -28,8 +28,8 @@ public class GetCartUsecaseImpl implements GetCartUsecase {
 
     @Override
     @Transactional(readOnly = true)
-    public GetCartResponse execute(Long userId) {
-        User user = userRepository.findById(userId)
+    public GetCartResponse execute(String email) {
+        User user = userRepository.findByEmailContainsIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Cart> cartItems = cartRepository.findByUser(user);
@@ -37,7 +37,7 @@ public class GetCartUsecaseImpl implements GetCartUsecase {
         List<CartItemResponse> items = cartItems.stream().map(cart ->
                 new CartItemResponse(
                         cart.getId(),
-                        BigInteger.valueOf(cart.getProduct().getId()),
+                        cart.getProduct().getId(),
                         cart.getProduct().getName(),
                         cart.getQuantity(),
                         cart.getIsProcessed(),

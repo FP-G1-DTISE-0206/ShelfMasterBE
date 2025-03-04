@@ -1,6 +1,8 @@
 package com.DTISE.ShelfMasterBE.infrastructure.cart.controller;
 
 
+import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.*;
 import com.DTISE.ShelfMasterBE.usecase.cart.AddToCartUsecase;
 import com.DTISE.ShelfMasterBE.usecase.cart.GetCartUsecase;
@@ -28,29 +30,33 @@ public class CartController {
 
 
     @PostMapping
-    public ResponseEntity<CreateCartItemResponse> addToCart(@RequestBody CreateCartItemRequest request) {
+    public ResponseEntity<?> addToCart(@RequestBody CreateCartItemRequest request) {
         System.out.println("Received request: " + request);
-        return ResponseEntity.ok(addToCartUsecase.execute(request));
+        return ApiResponse.successfulResponse("Item added to cart successfully", addToCartUsecase.execute(request));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<GetCartResponse> getCart(@PathVariable Long userId) {
-        GetCartResponse response = getCartUsecase.execute(userId);
-        return ResponseEntity.ok(response);
+
+    @GetMapping
+    public ResponseEntity<?> getCart() {
+        String email = Claims.getEmailFromJwt();
+        GetCartResponse response = getCartUsecase.execute(email);
+        return ApiResponse.successfulResponse("Cart retrieved successfully", response);
     }
 
-    @DeleteMapping("/{userId}/{cartId}")
-    public ResponseEntity<String> removeCartItem(@PathVariable Long userId ,@PathVariable Long cartId) {
-        removeCartItemUsecase.execute(userId, cartId);
-        return ResponseEntity.ok("Cart item removed successfully");
+
+    @DeleteMapping("/{cartId}")
+    public ResponseEntity<?> removeCartItem(@PathVariable Long cartId) {
+        String email = Claims.getEmailFromJwt();
+        removeCartItemUsecase.execute(email, cartId);
+        return ApiResponse.successfulResponse("Cart item removed successfully");
     }
 
-    @PutMapping("/{cartId}")  // ✅ Updated endpoint for updating cart items
-    public ResponseEntity<UpdateCartItemResponse> updateCartItem(
+    @PutMapping("/{cartId}")
+    public ResponseEntity<?> updateCartItem(
             @PathVariable Long cartId,
             @Valid @RequestBody UpdateCartItemRequest request) {
         UpdateCartItemResponse response = updateCartItemUsecase.execute(cartId, request);
-        return ResponseEntity.ok(response);
+        return ApiResponse.successfulResponse("Cart item updated successfully", response);
     }
 
 }

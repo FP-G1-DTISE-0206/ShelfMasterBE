@@ -26,11 +26,11 @@ public class RemoveCartItemUsecaseImpl implements RemoveCartItemUsecase {
 
     @Override
     @Transactional
-    public void execute(Long userId, Long cartId) {
-        User user = userRepository.findById(userId)
+    public void execute(String email, Long cartId) {
+        User user = userRepository.findByEmailContainsIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Cart cart = cartRepository.findById(BigInteger.valueOf(cartId))
+        Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
 //        if (!productRepository.existsById(cart.getProduct().getId())) {

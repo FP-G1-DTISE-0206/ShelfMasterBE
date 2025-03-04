@@ -4,5 +4,5 @@ import java.math.BigInteger;
 
 public interface RemoveCartItemUsecase {
 //    void execute(BigInteger cartItemId);
-    void execute(Long userId, Long cartId);
+    void execute(String email, Long cartId);
 }

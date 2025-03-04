@@ -5,5 +5,5 @@ import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.GetCartResponse;
 import java.math.BigInteger;
 
 public interface GetCartUsecase {
-    GetCartResponse execute(Long userId);
+    GetCartResponse execute(String email);
 }

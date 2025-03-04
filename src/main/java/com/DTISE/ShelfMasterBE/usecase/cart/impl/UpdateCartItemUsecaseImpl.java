@@ -23,7 +23,7 @@ public class UpdateCartItemUsecaseImpl implements UpdateCartItemUsecase {
     @Override
     @Transactional
     public UpdateCartItemResponse execute(Long cartId, UpdateCartItemRequest request) {
-        Cart cart = cartRepository.findById(BigInteger.valueOf(cartId))
+        Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
         cart.setQuantity(request.getQuantity());
@@ -32,7 +32,7 @@ public class UpdateCartItemUsecaseImpl implements UpdateCartItemUsecase {
 
         return new UpdateCartItemResponse(
                 cart.getId(),
-                BigInteger.valueOf(cart.getProduct().getId()),
+                cart.getProduct().getId(),
                 cart.getProduct().getName(),
                 cart.getQuantity(),
                 cart.getIsProcessed(),

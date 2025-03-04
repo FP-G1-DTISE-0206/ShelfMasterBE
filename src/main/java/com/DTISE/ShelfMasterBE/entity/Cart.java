@@ -23,7 +23,7 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_id_gen")
     @SequenceGenerator(name = "cart_id_gen", sequenceName = "cart_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
-    private BigInteger id;
+    private Long id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
