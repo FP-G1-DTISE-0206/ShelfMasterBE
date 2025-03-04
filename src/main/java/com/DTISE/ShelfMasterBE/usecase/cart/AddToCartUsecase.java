@@ -4,5 +4,5 @@ import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.CreateCartItemResponse;
 
 public interface AddToCartUsecase {
-    CreateCartItemResponse execute(CreateCartItemRequest request);
+    CreateCartItemResponse execute(CreateCartItemRequest request, String email);
 }

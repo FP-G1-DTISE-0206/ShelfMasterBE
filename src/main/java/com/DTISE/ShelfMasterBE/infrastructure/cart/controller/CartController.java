@@ -31,8 +31,9 @@ public class CartController {
 
     @PostMapping
     public ResponseEntity<?> addToCart(@RequestBody CreateCartItemRequest request) {
-        System.out.println("Received request: " + request);
-        return ApiResponse.successfulResponse("Item added to cart successfully", addToCartUsecase.execute(request));
+        String email = Claims.getEmailFromJwt();
+
+        return ApiResponse.successfulResponse("Item added to cart successfully", addToCartUsecase.execute(request, email));
     }
 
 
