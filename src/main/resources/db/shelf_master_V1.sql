@@ -412,15 +412,15 @@ CREATE TABLE "public"."promotion" (
 
 DROP TABLE IF EXISTS "public"."cart" CASCADE;
 CREATE TABLE "public"."cart" (
-                                      "id" BIGSERIAL NOT NULL,
-                                      user_id      bigint                                             not null,
-                                      product_id   bigint                                             not null,
-                                      quantity     bigint                   default 0                 not null,
-                                      is_processed boolean                  default false             not null,
-                                      created_at   timestamp with time zone default CURRENT_TIMESTAMP not null,
-                                      updated_at   timestamp with time zone default CURRENT_TIMESTAMP not null,
-                                      deleted_at   timestamp with time zone,
-                                      PRIMARY KEY ( "id" )
+                                 "id" BIGSERIAL NOT NULL,
+                                 "user_id" BIGINT NOT NULL,
+                                 "product_id" BIGINT NOT NULL,
+                                 "quantity" BIGINT NOT NULL DEFAULT 0,
+                                 "is_processed" BOOLEAN NOT NULL DEFAULT false,
+                                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                 "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                 PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
 
@@ -539,8 +539,6 @@ ALTER TABLE "public"."cart"
         DEFERRABLE INITIALLY DEFERRED;
 
 ALTER TABLE "public"."cart"
-     ADD CONSTRAINT "cart_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
+    ADD CONSTRAINT "cart_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
         ON DELETE NO ACTION ON UPDATE NO ACTION
-    DEFERRABLE INITIALLY DEFERRED;
-
-
+        DEFERRABLE INITIALLY DEFERRED;
