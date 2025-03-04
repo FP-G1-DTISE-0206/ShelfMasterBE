@@ -33,20 +33,14 @@ public class AddToCartUsecaseImpl implements AddToCartUsecase {
 
     @Override
     @Transactional
-    public CreateCartItemResponse execute(CreateCartItemRequest request) {
-        System.out.println("Received userId: " + request.getUserId());
-        System.out.println("Received productId: " + request.getProductId());
+    public CreateCartItemResponse execute(CreateCartItemRequest request, String email) {
+       User user = userRepository.findByEmailContainsIgnoreCase(email)
+               .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (request.getUserId() == null) {
-            throw new IllegalArgumentException("User ID cannot be null");
-        }
+
         if (request.getProductId() == null) {
             throw new IllegalArgumentException("Product ID cannot be null");
         }
-
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
 
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));

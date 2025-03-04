@@ -32,8 +32,7 @@ public class GetCartUsecaseImpl implements GetCartUsecase {
         User user = userRepository.findByEmailContainsIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Cart> cartItems = cartRepository.findByUser(user);
-
+        List<Cart> cartItems = cartRepository.findByUserOrderByIdDesc(user);
         List<CartItemResponse> items = cartItems.stream().map(cart ->
                 new CartItemResponse(
                         cart.getId(),

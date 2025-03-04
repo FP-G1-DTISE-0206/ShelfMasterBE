@@ -17,9 +17,6 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 public class CreateCartItemRequest {
 
-    @NotNull(message = "User ID cannot be null")
-    private Long userId;
-
     @NotNull(message = "Product ID cannot be null")
     private Long productId;
 
@@ -28,16 +25,11 @@ public class CreateCartItemRequest {
     private Integer quantity;
 
     public Cart toEntity(User user, Product product) {
-        return new Cart(
-                null,
-                user,
-                product,
-                quantity,
-                false,
-                null,
-                null,
-                null
-        );
-
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cart.setProduct(product);
+        cart.setQuantity(quantity);
+        cart.setIsProcessed(false);
+        return cart;
     }
 }
