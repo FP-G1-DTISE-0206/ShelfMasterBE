@@ -407,6 +407,24 @@ CREATE TABLE "public"."promotion" (
     WITH ( OIDS=FALSE );
 
 -- -----------------------------------
+-- "public"."cart"
+-- -----------------------------------
+
+DROP TABLE IF EXISTS "public"."cart" CASCADE;
+CREATE TABLE "public"."cart" (
+                                      "id" BIGSERIAL NOT NULL,
+                                      user_id      bigint                                             not null,
+                                      product_id   bigint                                             not null,
+                                      quantity     bigint                   default 0                 not null,
+                                      is_processed boolean                  default false             not null,
+                                      created_at   timestamp with time zone default CURRENT_TIMESTAMP not null,
+                                      updated_at   timestamp with time zone default CURRENT_TIMESTAMP not null,
+                                      deleted_at   timestamp with time zone,
+                                      PRIMARY KEY ( "id" )
+)
+    WITH ( OIDS=FALSE );
+
+-- -----------------------------------
 -- Foreign Keys
 -- -----------------------------------
 
@@ -514,3 +532,15 @@ ALTER TABLE "public"."warehouse_admins"
     ADD CONSTRAINT "warehouse_admins_warehouse_id_fkey" FOREIGN KEY ( "warehouse_id" ) REFERENCES "public"."warehouse" ( "id" )
         ON DELETE NO ACTION ON UPDATE NO ACTION
         DEFERRABLE INITIALLY DEFERRED;
+
+ALTER TABLE "public"."cart"
+    ADD CONSTRAINT "cart_user_id_fkey" FOREIGN KEY ( "user_id" ) REFERENCES "public"."user" ( "id" )
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
+
+ALTER TABLE "public"."cart"
+     ADD CONSTRAINT "cart_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+    DEFERRABLE INITIALLY DEFERRED;
+
+

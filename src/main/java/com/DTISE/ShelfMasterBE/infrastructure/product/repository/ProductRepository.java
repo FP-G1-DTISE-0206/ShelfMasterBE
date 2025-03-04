@@ -2,11 +2,13 @@ package com.DTISE.ShelfMasterBE.infrastructure.product.repository;
 
 import com.DTISE.ShelfMasterBE.entity.Product;
 import io.lettuce.core.dynamic.annotation.Param;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,4 +32,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("categoryIds") List<Long> categoryIds,
             Pageable pageable
     );
+
+    Optional<Object> findById(@NotNull BigInteger productId);
 }
