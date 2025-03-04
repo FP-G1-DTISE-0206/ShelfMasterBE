@@ -51,6 +51,8 @@ public class SecurityConfig {
                         //  Define public routes
                         .requestMatchers("/error/**").permitAll()
                         .requestMatchers("/api/v1/simple").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/product").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/category").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/google-login").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
