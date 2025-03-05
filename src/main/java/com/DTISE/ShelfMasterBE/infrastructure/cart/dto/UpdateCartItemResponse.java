@@ -1,12 +1,10 @@
 package com.DTISE.ShelfMasterBE.infrastructure.cart.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Data
@@ -17,6 +15,8 @@ public class UpdateCartItemResponse {
     private Long productId;
     private String productName;
     private Integer quantity;
+    private BigDecimal weight;
+    private String sku;
     private Boolean isProcessed;
     private OffsetDateTime updatedAt;
 }
