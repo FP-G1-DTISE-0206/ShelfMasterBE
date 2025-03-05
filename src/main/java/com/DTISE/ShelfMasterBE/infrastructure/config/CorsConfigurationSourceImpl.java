@@ -12,7 +12,7 @@ public class CorsConfigurationSourceImpl implements CorsConfigurationSource {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         corsConfiguration.setAllowedOriginPatterns(List.of("http://localhost:3001", "http://localhost:3000",
-                "http://0.0.0.0:3000", "http://host.docker.internal:3000","https://shelfmaster.ddns.net:3000"));
+                "http://0.0.0.0:3000", "http://host.docker.internal:3000","https://shelfmaster.ddns.net"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setExposedHeaders(

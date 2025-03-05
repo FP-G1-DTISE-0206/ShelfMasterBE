@@ -46,7 +46,8 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
 //                .cors(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(new CorsConfigurationSourceImpl()))
+//                .cors(cors -> cors.configurationSource(new CorsConfigurationSourceImpl()))
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         //  Define public routes
                         .requestMatchers("/error/**").permitAll()
