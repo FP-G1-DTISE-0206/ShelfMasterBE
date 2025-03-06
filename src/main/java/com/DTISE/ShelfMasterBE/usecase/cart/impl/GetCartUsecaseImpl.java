@@ -39,7 +39,7 @@ public class GetCartUsecaseImpl implements GetCartUsecase {
                         cart.getProduct().getId(),
                         cart.getProduct().getName(),
                         cart.getQuantity(),
-                        cart.getWeight(),
+                        cart.getProduct().getWeight(),
                         cart.getProduct().getSku(),
                         cart.getIsProcessed(),
                         cart.getCreatedAt(),
@@ -49,9 +49,10 @@ public class GetCartUsecaseImpl implements GetCartUsecase {
 
         int totalQuantity = cartItems.stream().mapToInt(Cart::getQuantity).sum();
 
-        BigDecimal totalWeight = cartItems.stream()
-                .map(Cart::getWeight)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//        BigDecimal totalWeight = cartItems.stream()
+//                .map(Cart::getWeight)
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalWeight = cartItems.stream().map(cart -> cart.getProduct().getWeight().multiply(BigDecimal.valueOf(cart.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalPrice = cartItems.stream().map(cart -> cart.getProduct().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
 

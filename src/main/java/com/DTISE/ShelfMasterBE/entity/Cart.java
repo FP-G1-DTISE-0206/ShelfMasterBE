@@ -42,14 +42,14 @@ public class Cart {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @NotNull
-    @Column(name = "weight", precision = 10, scale = 2)
-    private BigDecimal weight;
-
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "sku", nullable = false)
-    private String sku;
+//    @NotNull
+//    @Column(name = "weight", precision = 10, scale = 2)
+//    private BigDecimal weight;
+//
+//    @Size(max = 255)
+//    @NotNull
+//    @Column(name = "sku", nullable = false)
+//    private String sku;
 
     @NotNull
     @ColumnDefault("FALSE")
