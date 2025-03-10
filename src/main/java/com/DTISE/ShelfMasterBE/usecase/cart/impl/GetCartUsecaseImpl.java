@@ -47,7 +47,7 @@ public class GetCartUsecaseImpl implements GetCartUsecase {
                 )
         ).collect(Collectors.toList());
 
-        int totalQuantity = cartItems.stream().mapToInt(Cart::getQuantity).sum();
+        Long totalQuantity = cartItems.stream().mapToLong(Cart::getQuantity).sum();
 
 //        BigDecimal totalWeight = cartItems.stream()
 //                .map(Cart::getWeight)

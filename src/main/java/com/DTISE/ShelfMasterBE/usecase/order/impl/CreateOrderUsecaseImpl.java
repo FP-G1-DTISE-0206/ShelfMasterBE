@@ -5,9 +5,11 @@ import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.GetCartResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.order.dto.CreateOrderRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.order.dto.CreateOrderResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderItemRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderStatusRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.payment.PaymentMethodRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.repository.WarehouseRepository;
 import com.DTISE.ShelfMasterBE.usecase.cart.impl.GetCartUsecaseImpl;
 import com.DTISE.ShelfMasterBE.usecase.order.CreateOrderUsecase;
@@ -15,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,8 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
     private final GetCartUsecaseImpl getCartUsecase;
     private final PaymentMethodRepository paymentMethodRepository;
     private final WarehouseRepository warehouseRepository;
+    private final ProductRepository productRepository;
+    private final OrderItemRepository orderItemRepository;
 
 
     @Override
@@ -44,6 +51,17 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
 
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId()).orElseThrow(() -> new RuntimeException("Invalid warehouse"));
 
+//        Set<OrderItem> orderItems = cartResponse.getCartItems().stream(
+//                ).map(cart ->{
+//                    OrderItem orderItem = new OrderItem();
+//                    Product product = productRepository.findById(cart.getProductId()).orElseThrow(() -> new RuntimeException("Product not found"));
+//                    orderItem.setProduct(product);
+//                    orderItem.setQuantity(cart.getQuantity());
+//                    orderItem.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())));
+//                    return orderItem;
+//                }
+//        ).collect(Collectors.toSet());
+
 
         Order order = new Order();
         order.setUser(user);
@@ -53,6 +71,7 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
         order.setPaymentMethod(paymentMethod);
         order.setWarehouse(warehouse);
         order.setIsPaid(false);
+//        order.setOrderItems(orderItems);
         order.setCreatedAt(OffsetDateTime.now());
         order.setUpdatedAt(OffsetDateTime.now());
 
@@ -67,6 +86,20 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
         }
 
         Order savedOrder = orderRepository.save(order);
+        cartResponse.getCartItems().forEach(cart -> {
+            OrderItem orderItem = new OrderItem();
+            Product product = productRepository.findById(cart.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            orderItem.setProduct(product);
+            orderItem.setQuantity(cart.getQuantity());
+            orderItem.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())));
+            orderItem.setOrder(savedOrder);
+
+            orderItemRepository.save(orderItem);
+        });
+
+
 
         // Return response
         return new CreateOrderResponse(

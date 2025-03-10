@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.OffsetDateTime;
 
 @Data
@@ -14,7 +15,7 @@ public class CartItemResponse {
     private Long cartId;
     private Long productId;
     private String productName;
-    private Integer quantity;
+    private Long quantity;
     private BigDecimal weight;
     private String sku;
     private Boolean isProcessed;

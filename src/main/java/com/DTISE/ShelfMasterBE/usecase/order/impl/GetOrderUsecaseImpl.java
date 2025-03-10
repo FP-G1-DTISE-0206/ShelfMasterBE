@@ -10,10 +10,11 @@ import com.DTISE.ShelfMasterBE.infrastructure.user.dto.UserResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.dto.WarehouseResponse;
 import com.DTISE.ShelfMasterBE.usecase.order.GetOrderUsecase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,34 +27,56 @@ public class GetOrderUsecaseImpl implements GetOrderUsecase {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GetOrderResponse> execute(String email) {
+    public Page<GetOrderResponse> getOrders(Pageable pageable, String search, String email) {
         User user = userRepository.findByEmailContainsIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<GetOrderResponse> orders = orderRepository.findByUser(user).stream()
-                .filter(order -> order.getDeletedAt() == null)
-                .sorted((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
-                .map(order -> new GetOrderResponse(
-                        order.getId(),
-                        new UserResponse(order.getUser()),
-                        order.getLatestStatus().getName(),
-                        order.getPaymentMethod().getName(),
-                        new WarehouseResponse(order.getWarehouse()),
-                        order.getMidtransTokenUrl(),
-                        order.getManualTransferProof(),
-                        order.getTotalPrice(),
-                        order.getIsPaid(),
-                        order.getAddressId(),
-                        order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList())
-                ))
-                .collect(Collectors.toList());
-
-        if (orders.isEmpty()) {
-            throw new RuntimeException("No orders found for user " + email);
+        if (user.getRoles().stream()
+                .anyMatch(role -> role.getName().equals("SUPER_ADMIN"))) {
+            return orderRepository.findBySearch(search, pageable).map(order -> new GetOrderResponse(
+                    order.getId(),
+                    new UserResponse(order.getUser()),
+                    order.getLatestStatus().getName(),
+                    order.getPaymentMethod().getName(),
+                    new WarehouseResponse(order.getWarehouse()),
+                    order.getMidtransTokenUrl(),
+                    order.getManualTransferProof(),
+                    order.getTotalPrice(),
+                    order.getIsPaid(),
+                    order.getAddressId(),
+                    order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList())
+            ));
         }
 
-        return orders;
+        if (user.getRoles().stream()
+                .anyMatch(role -> role.getName().equals("WH_ADMIN"))) {
+            return orderRepository.findByAdminAndSearch(user, search, pageable).map(order -> new GetOrderResponse(
+                    order.getId(),
+                    new UserResponse(order.getUser()),
+                    order.getLatestStatus().getName(),
+                    order.getPaymentMethod().getName(),
+                    new WarehouseResponse(order.getWarehouse()),
+                    order.getMidtransTokenUrl(),
+                    order.getManualTransferProof(),
+                    order.getTotalPrice(),
+                    order.getIsPaid(),
+                    order.getAddressId(),
+                    order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList())
+            ));
+        }
+
+        return orderRepository.findByUserAndSearch(user, search, pageable).map(order -> new GetOrderResponse(
+                order.getId(),
+                new UserResponse(order.getUser()),
+                order.getLatestStatus().getName(),
+                order.getPaymentMethod().getName(),
+                new WarehouseResponse(order.getWarehouse()),
+                order.getMidtransTokenUrl(),
+                order.getManualTransferProof(),
+                order.getTotalPrice(),
+                order.getIsPaid(),
+                order.getAddressId(),
+                order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList())
+        ));
     }
-
-
 }

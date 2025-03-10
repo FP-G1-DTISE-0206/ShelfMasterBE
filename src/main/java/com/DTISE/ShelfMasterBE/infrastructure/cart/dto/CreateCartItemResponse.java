@@ -15,7 +15,7 @@ public class CreateCartItemResponse {
     private Long cartId;
     private Long productId;
     private String productName;
-    private Integer quantity;
+    private Long quantity;
     private BigDecimal weight;
     private String sku;
     private Boolean isProcessed;

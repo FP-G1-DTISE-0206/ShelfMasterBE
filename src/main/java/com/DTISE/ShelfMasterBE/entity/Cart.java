@@ -40,7 +40,7 @@ public class Cart {
     @NotNull
     @ColumnDefault("0")
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Long quantity;
 
     @NotNull
     @ColumnDefault("FALSE")

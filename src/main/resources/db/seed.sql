@@ -370,6 +370,7 @@ INSERT INTO public.order_status ("name",created_at,updated_at,deleted_at) VALUES
 	 ('Canceled','2024-02-28 14:37:45.837963+07','2024-02-28 14:37:45.837963+07',NULL);
 	 
 
+
 INSERT INTO public."order" (user_id,latest_status,total_price,is_paid,address_id,created_at,updated_at,deleted_at) VALUES
 	 (34,'5',1120000.0,true,1,'2024-01-08 14:41:51.326388+07','2024-01-08 14:41:51.326388+07',NULL),
 	 (35,'5',466200.0,true,2,'2024-01-28 14:41:51.326388+07','2024-01-28 14:41:51.326388+07',NULL),
