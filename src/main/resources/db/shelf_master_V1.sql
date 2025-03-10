@@ -316,12 +316,18 @@ CREATE TABLE "public"."order" (
                                   "total_price" DOUBLE PRECISION NOT NULL DEFAULT 0,
                                   "is_paid" BOOLEAN NOT NULL DEFAULT false,
                                   "address_id" BIGINT NOT NULL,
+                                  "payment_method_id" BIGINT DEFAULT 1 NOT NULL ,
+                                  "gateway_trx_id" text,
+                                  "payment_proof" text,
+                                  "warehouse_id" BIGINT NOT NULL,
                                   "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                   "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                   "deleted_at" TIMESTAMP WITH TIME ZONE,
                                   PRIMARY KEY ( "id" )
 )
     WITH ( OIDS=FALSE );
+
+
 
 -- -----------------------------------
 -- "public"."order_items"
@@ -540,5 +546,15 @@ ALTER TABLE "public"."cart"
 
 ALTER TABLE "public"."cart"
     ADD CONSTRAINT "cart_product_id_fkey" FOREIGN KEY ( "product_id" ) REFERENCES "public"."product" ( "id" )
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
+
+ALTER TABLE "public"."order"
+    ADD CONSTRAINT "order_payment_method_id_fkey" FOREIGN KEY ( "payment_method_id" ) REFERENCES "public"."payment_method" ( "id" )
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+        DEFERRABLE INITIALLY DEFERRED;
+
+ALTER TABLE "public"."order"
+    ADD CONSTRAINT "order_warehouse_id_fkey" FOREIGN KEY ( "warehouse_id" ) REFERENCES "public"."warehouse" ( "id" )
         ON DELETE NO ACTION ON UPDATE NO ACTION
         DEFERRABLE INITIALLY DEFERRED;
