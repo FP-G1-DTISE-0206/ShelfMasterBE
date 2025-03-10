@@ -1,5 +1,6 @@
 package com.DTISE.ShelfMasterBE.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -23,12 +24,15 @@ public class OrderItem {
     private Long id;
 
     @NotNull
-    @Column(name = "order_id", nullable = false)
-    private Long orderId;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id", nullable = false)
+//    @JsonIgnore
+    private Order order;
 
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull
     @Column(name = "quantity")

@@ -76,19 +76,19 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
     }
 
     private void processMutation(OrderItem orderItem) {
-        if(stockRepo.getTotalStockByProductId(orderItem.getProductId()) <= 0L) {
+        if(stockRepo.getTotalStockByProductId(orderItem.getProduct().getId()) <= 0L) {
             throw new InsufficientStockException("Insufficient stock");
         }
 
         ProductStock stock = stockRepo.findFirstByProductIdAndWarehouseId(
-                        orderItem.getProductId(), localWarehouseId)
-                .orElseGet(() -> createNewEmptyStock(orderItem.getProductId()));
+                        orderItem.getProduct().getId(), localWarehouseId)
+                .orElseGet(() -> createNewEmptyStock(orderItem.getProduct().getId()));
 
         if (stock.getQuantity() < orderItem.getQuantity()) {
             handleInsufficientLocalStock(orderItem);
         } else {
             orderAutoMutate(
-                    orderItem.getProductId(),
+                    orderItem.getProduct().getId(),
                     orderItem.getQuantity(),
                     localWarehouseId,
                     buyerId
@@ -109,7 +109,7 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
         Integer length = 10, page = 1;
         AtomicReference<Long> remainingQuantity = new AtomicReference<>(orderItem.getQuantity());
         while (remainingQuantity.get() > 0) {
-            Page<ProductStock> productStocks = fetchProductStocks(orderItem.getProductId(), length, page);
+            Page<ProductStock> productStocks = fetchProductStocks(orderItem.getProduct().getId(), length, page);
             if(productStocks.isEmpty() && remainingQuantity.get() < 0) {
                 throw new InsufficientStockException("Insufficient stock");
             }
@@ -120,7 +120,7 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
             page++;
         }
 
-        orderAutoMutate(orderItem.getProductId(), orderItem.getQuantity(),
+        orderAutoMutate(orderItem.getProduct().getId(), orderItem.getQuantity(),
                 localWarehouseId, buyerId);
     }
 
@@ -139,7 +139,7 @@ public class OrderMutationUseCaseImpl implements OrderMutationUseCase {
                         remainingQuantity.get() - productStock.getQuantity()
                 );
             } else {
-                transferStockBetweenWarehouse(orderItem.getProductId(), productStock, remainingQuantity);
+                transferStockBetweenWarehouse(orderItem.getProduct().getId(), productStock, remainingQuantity);
             }
         });
     }

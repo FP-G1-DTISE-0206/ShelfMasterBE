@@ -42,28 +42,17 @@ public class Cart {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-//    @NotNull
-//    @Column(name = "weight", precision = 10, scale = 2)
-//    private BigDecimal weight;
-//
-//    @Size(max = 255)
-//    @NotNull
-//    @Column(name = "sku", nullable = false)
-//    private String sku;
-
     @NotNull
     @ColumnDefault("FALSE")
     @Column(name = "is_processed", nullable = false)
     private Boolean isProcessed = false;
 
     @NotNull
-//    @ColumnDefault("CURRENT_TIMESTAMP")
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     @NotNull
-//    @ColumnDefault("CURRENT_TIMESTAMP")
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
