@@ -46,6 +46,7 @@ public class SendEmailUsecaseImpl implements SendEmailUsecase {
             mailSender.send(message);
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to send verification email, " + e.getMessage());
         }
     }
@@ -77,6 +78,7 @@ public class SendEmailUsecaseImpl implements SendEmailUsecase {
             mailSender.send(message);
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to send reset password link, " + e.getMessage());
         }
     }

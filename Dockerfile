@@ -27,4 +27,7 @@ EXPOSE 8080
 
 # Run the application
 #ENTRYPOINT ["java", "-jar", "app.jar"]
-ENTRYPOINT ["sh", "-c", "export $(grep -v '^#' /config/.env | xargs) && java -jar app.jar"]
+#ENTRYPOINT ["sh", "-c", "export $(grep -v '^#' /config/.env | xargs) && java -jar app.jar"]
+#ENTRYPOINT ["sh", "-c", ". /config/.env && exec java -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "set -o allexport && source /config/.env && set +o allexport && exec java -jar app.jar"]
+
