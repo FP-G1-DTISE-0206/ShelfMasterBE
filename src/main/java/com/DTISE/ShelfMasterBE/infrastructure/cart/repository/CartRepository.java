@@ -4,6 +4,7 @@ import com.DTISE.ShelfMasterBE.entity.Cart;
 import com.DTISE.ShelfMasterBE.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.DTISE.ShelfMasterBE.entity.Product;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -14,4 +15,7 @@ public interface CartRepository extends JpaRepository <Cart, Long> {
     Optional<Cart> findByUserAndProduct(User user, Product product);
 
     List<Cart> findByUserOrderByIdDesc(User user);
+
+    @Transactional
+    void deleteByUser(User user);
 }

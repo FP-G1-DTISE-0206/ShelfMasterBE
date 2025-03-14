@@ -15,5 +15,8 @@ public class CreateOrderResponse {
     private String paymentMethod;
     private Boolean isPaid;
     private BigDecimal totalPrice;
+    private BigDecimal finalPrice;
     private Long addressId;
+    private Double shippingCost;
+    private String shippingMethod;
 }

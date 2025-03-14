@@ -53,6 +53,10 @@ public class Order {
     private BigDecimal totalPrice;
 
     @NotNull
+    @Column(name = "final_price", nullable = false)
+    private BigDecimal finalPrice;
+
+    @NotNull
     @ColumnDefault("false")
     @Column(name = "is_paid", nullable = false)
     private Boolean isPaid = false;
@@ -66,6 +70,16 @@ public class Order {
 
     @Column(name="payment_proof")
     private String manualTransferProof;
+
+    @NotNull
+    @Column(name = "shipping_cost", nullable = false)
+    @ColumnDefault("0.0")
+    private Double shippingCost;
+
+    @NotNull
+    @Size(max = 255)
+    @Column(name = "shipping_method", nullable = false)
+    private String shippingMethod;
 
     @NotNull
     @CreationTimestamp

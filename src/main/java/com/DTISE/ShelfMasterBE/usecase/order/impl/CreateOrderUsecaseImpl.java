@@ -3,6 +3,7 @@ package com.DTISE.ShelfMasterBE.usecase.order.impl;
 import com.DTISE.ShelfMasterBE.entity.*;
 import com.DTISE.ShelfMasterBE.infrastructure.auth.repository.UserRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.cart.dto.GetCartResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.cart.repository.CartRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.order.dto.CreateOrderRequest;
 import com.DTISE.ShelfMasterBE.infrastructure.order.dto.CreateOrderResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderItemRepository;
@@ -34,6 +35,7 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
     private final WarehouseRepository warehouseRepository;
     private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
+    private final CartRepository cartRepository;
 
 
     @Override
@@ -43,6 +45,10 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         GetCartResponse cartResponse = getCartUsecase.execute(email);
+
+        if(cartResponse.getCartItems().isEmpty()){
+            throw new RuntimeException("Cart is empty, You cannot proceed to checkout.");
+        }
         OrderStatus defaultStatus = orderStatusRepository.findById(1L)
                 .orElseThrow(() -> new RuntimeException("Default order status not found"));
 
@@ -51,6 +57,14 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
 
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId()).orElseThrow(() -> new RuntimeException("Invalid warehouse"));
 
+        if (request.getShippingMethod() == null || request.getShippingMethod().isBlank()) {
+            throw new RuntimeException("Shipping method is required.");
+        }
+        if (request.getShippingCost() == null || request.getShippingCost() < 0) {
+            throw new RuntimeException("Invalid shipping cost.");
+        }
+
+        BigDecimal finalPrice = cartResponse.getTotalPrice().add(BigDecimal.valueOf(request.getShippingCost()));
 //        Set<OrderItem> orderItems = cartResponse.getCartItems().stream(
 //                ).map(cart ->{
 //                    OrderItem orderItem = new OrderItem();
@@ -67,6 +81,7 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
         order.setUser(user);
         order.setAddressId(request.getAddressId());
         order.setTotalPrice(cartResponse.getTotalPrice());
+        order.setFinalPrice(finalPrice);
         order.setLatestStatus(defaultStatus);
         order.setPaymentMethod(paymentMethod);
         order.setWarehouse(warehouse);
@@ -74,16 +89,21 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
 //        order.setOrderItems(orderItems);
         order.setCreatedAt(OffsetDateTime.now());
         order.setUpdatedAt(OffsetDateTime.now());
+        order.setShippingCost(request.getShippingCost());
+        order.setShippingMethod(request.getShippingMethod());
+
 
         if (request.getPaymentMethodId() == 1) {
             order.setMidtransTokenUrl("MidtransToken123");
             order.setManualTransferProof(null);
         } else if (request.getPaymentMethodId() == 2) {
-            order.setManualTransferProof("https://dummy-qrcode.com/payment-qr-123");
+            order.setManualTransferProof("https://www.qr-code-generator.com/");
             order.setMidtransTokenUrl(null);
         } else {
             throw new RuntimeException("Unsupported payment method.");
         }
+
+
 
         Order savedOrder = orderRepository.save(order);
         cartResponse.getCartItems().forEach(cart -> {
@@ -96,8 +116,11 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
             orderItem.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())));
             orderItem.setOrder(savedOrder);
 
+
             orderItemRepository.save(orderItem);
         });
+
+        cartRepository.deleteByUser(user);
 
 
 
@@ -108,7 +131,10 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
                 savedOrder.getPaymentMethod().getName(),
                 savedOrder.getIsPaid(),
                 savedOrder.getTotalPrice(),
-                savedOrder.getAddressId()
+                savedOrder.getFinalPrice(),
+                savedOrder.getAddressId(),
+                savedOrder.getShippingCost(),
+                savedOrder.getShippingMethod()
         );
     }
 }

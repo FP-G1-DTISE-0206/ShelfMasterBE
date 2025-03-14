@@ -42,9 +42,12 @@ public class GetOrderUsecaseImpl implements GetOrderUsecase {
                     order.getMidtransTokenUrl(),
                     order.getManualTransferProof(),
                     order.getTotalPrice(),
+                    order.getFinalPrice(),
                     order.getIsPaid(),
                     order.getAddressId(),
-                    order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList())
+                    order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList()),
+                    order.getShippingCost(),
+                    order.getShippingMethod()
             ));
         }
 
@@ -59,9 +62,12 @@ public class GetOrderUsecaseImpl implements GetOrderUsecase {
                     order.getMidtransTokenUrl(),
                     order.getManualTransferProof(),
                     order.getTotalPrice(),
+                    order.getFinalPrice(),
                     order.getIsPaid(),
                     order.getAddressId(),
-                    order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList())
+                    order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList()),
+                    order.getShippingCost(),
+                    order.getShippingMethod()
             ));
         }
 
@@ -74,9 +80,12 @@ public class GetOrderUsecaseImpl implements GetOrderUsecase {
                 order.getMidtransTokenUrl(),
                 order.getManualTransferProof(),
                 order.getTotalPrice(),
+                order.getFinalPrice(),
                 order.getIsPaid(),
                 order.getAddressId(),
-                order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList())
+                order.getOrderItems().stream().map(OrderItemResponse::new).collect(Collectors.toList()),
+                order.getShippingCost(),
+                order.getShippingMethod()
         ));
     }
 }

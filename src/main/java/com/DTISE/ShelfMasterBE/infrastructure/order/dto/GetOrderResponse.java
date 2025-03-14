@@ -24,7 +24,10 @@ public class GetOrderResponse {
     private String midtransTokenUrl;
     private String manualTransferProof;
     private BigDecimal totalPrice;
+    private BigDecimal finalPrice;
     private Boolean isPaid;
     private Long addressId;
     private List<OrderItemResponse> orderItem;
+    private Double shippingCost;
+    private String shippingMethod;
 }

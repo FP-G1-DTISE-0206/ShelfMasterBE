@@ -15,5 +15,7 @@ public class CreateOrderRequest {
     private Long paymentMethodId;
     private String manualTransferProof;
     private Long warehouseId;
+    private Double shippingCost; 
+    private String shippingMethod;
 //    private BigDecimal totalPrice;
 }
