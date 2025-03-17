@@ -928,3 +928,7 @@ INSERT INTO public.product_mutation_order (order_id,ordered_product_mutation_id,
 	 (41,133,NULL,'2025-03-04 16:17:47.26534+07','2025-03-04 16:17:47.26534+07',NULL),
 	 (42,134,NULL,'2025-03-04 16:17:54.691078+07','2025-03-04 16:17:54.691078+07',NULL),
 	 (42,135,NULL,'2025-03-04 16:17:54.704194+07','2025-03-04 16:17:54.704194+07',NULL);
+
+INSERT INTO public.payment_method (id, name,created_at,updated_at,deleted_at) VALUES
+   (1,'payment_gateway','2025-03-10 03:06:40.278000 +00:00','2025-03-10 03:06:43.336000 +00:00',NULL),
+   (2,'manual_transfer ','2025-03-10 03:07:10.184000 +00:00','2025-03-10 03:07:12.504000 +00:00',NULL);
