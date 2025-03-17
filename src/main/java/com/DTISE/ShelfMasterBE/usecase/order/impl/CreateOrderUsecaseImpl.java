@@ -10,10 +10,13 @@ import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderItemReposito
 import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.order.repository.OrderStatusRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.payment.PaymentMethodRepository;
+import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.MidtransTransactionRequest;
+import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.MidtransTransactionResponse;
 import com.DTISE.ShelfMasterBE.infrastructure.product.repository.ProductRepository;
 import com.DTISE.ShelfMasterBE.infrastructure.warehouse.repository.WarehouseRepository;
 import com.DTISE.ShelfMasterBE.usecase.cart.impl.GetCartUsecaseImpl;
 import com.DTISE.ShelfMasterBE.usecase.order.CreateOrderUsecase;
+import com.DTISE.ShelfMasterBE.usecase.payment.MidtransPaymentUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +39,7 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
     private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartRepository cartRepository;
+    private final MidtransPaymentUseCase midtransPaymentUseCase;
 
 
     @Override
@@ -92,10 +96,18 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
         order.setShippingCost(request.getShippingCost());
         order.setShippingMethod(request.getShippingMethod());
 
+        Order savedOrder = orderRepository.save(order);
 
         if (request.getPaymentMethodId() == 1) {
-            order.setMidtransTokenUrl("MidtransToken123");
-            order.setManualTransferProof(null);
+            MidtransTransactionRequest midtransRequest = new MidtransTransactionRequest(
+                    "ORDER-" + savedOrder.getId(),
+                    finalPrice.doubleValue(),
+                    "bank_transfer"
+            );
+            MidtransTransactionResponse midtransResponse = midtransPaymentUseCase.createTransaction(midtransRequest);
+
+            savedOrder.setMidtransTokenUrl(midtransResponse.getRedirectUrl());
+            savedOrder.setManualTransferProof(null);
         } else if (request.getPaymentMethodId() == 2) {
             order.setManualTransferProof("https://www.qr-code-generator.com/");
             order.setMidtransTokenUrl(null);
@@ -103,9 +115,11 @@ public class CreateOrderUsecaseImpl implements CreateOrderUsecase {
             throw new RuntimeException("Unsupported payment method.");
         }
 
+        orderRepository.save(savedOrder);
 
 
-        Order savedOrder = orderRepository.save(order);
+
+
         cartResponse.getCartItems().forEach(cart -> {
             OrderItem orderItem = new OrderItem();
             Product product = productRepository.findById(cart.getProductId())

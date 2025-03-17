@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderRequest {
+    private Long orderId;
     private Long userId;
     private Long addressId;
     private Long paymentMethodId;

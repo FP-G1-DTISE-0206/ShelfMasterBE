@@ -9,6 +9,7 @@ import com.DTISE.ShelfMasterBE.usecase.order.CreateOrderUsecase;
 import com.DTISE.ShelfMasterBE.usecase.order.GetOrderUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
+@PreAuthorize("hasAuthority('SCOPE_USER')")
 public class OrderController {
 
     private final CreateOrderUsecase createOrderUsecase;

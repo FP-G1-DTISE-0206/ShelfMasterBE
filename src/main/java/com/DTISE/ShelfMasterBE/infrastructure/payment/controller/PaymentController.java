@@ -1,7 +1,10 @@
 package com.DTISE.ShelfMasterBE.infrastructure.payment.controller;
 
-import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentRequest;
-import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentResponse;
+import com.DTISE.ShelfMasterBE.infrastructure.auth.Claims;
+import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.*;
+import com.DTISE.ShelfMasterBE.usecase.payment.CreatePaymentUsecase;
+import com.DTISE.ShelfMasterBE.usecase.payment.GetPaymentStatusUsecase;
+import com.DTISE.ShelfMasterBE.usecase.payment.HandleMidtransWebhookUsecase;
 import com.DTISE.ShelfMasterBE.usecase.payment.MidtransServiceUsecase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,25 +12,34 @@ import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final MidtransServiceUsecase midtransServiceUsecase;
-//    @PostMapping("/create")
-//    public ResponseEntity<?> createTransaction(@Valid @RequestBody PaymentRequest request) {
-//        System.out.println("💰 Received Payment Request: " + request);
-//        return ResponseEntity.ok(midtransServiceUsecase.createTransaction(request));
-//    }
+    private final CreatePaymentUsecase createPaymentUsecase;
+    private final GetPaymentStatusUsecase getPaymentStatusUsecase;
+    private final HandleMidtransWebhookUsecase handleMidtransWebhookUsecase;
 
+    @PostMapping
+    public ResponseEntity<?> createPayment(@RequestBody CreatePaymentRequest request) {
+        String email = Claims.getEmailFromJwt();
+        CreatePaymentResponse response = createPaymentUsecase.execute(request, email);
+        return ApiResponse.successfulResponse("Payment created successfully", response);
+    }
 
-    @PostMapping("/create")
-    public ApiResponse<PaymentResponse> createTransaction(@Valid @RequestBody PaymentRequest request) {
-        System.out.println("Received Payment Request: " + request);
-        PaymentResponse response = midtransServiceUsecase.createTransaction(request);
-//        return ResponseEntity.ok(response);
-        return ApiResponse.successfulResponse("Transaction created successfully", response).getBody();
+    @GetMapping("/status/{orderId}")
+    public ResponseEntity<?> getPaymentStatus(@PathVariable Long orderId) {
+        PaymentStatusResponse response = getPaymentStatusUsecase.execute(orderId);
+        return ApiResponse.successfulResponse("Payment status retrieved successfully", response);
+    }
+
+    @PostMapping("/webhook")
+    public ResponseEntity<?> handleMidtransWebhook(@RequestBody Map<String, Object> payload) {
+        handleMidtransWebhookUsecase.execute(payload);
+        return ResponseEntity.ok("Webhook processed successfully");
     }
 }
 
@@ -50,14 +62,3 @@ public class PaymentController {
 //    return ApiResponse.successfulResponse("Payment status retrieved successfully", response);
 //}
 
-//import com.DTISE.ShelfMasterBE.common.response.ApiResponse;
-//import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentRequest;
-//import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentResponse;
-//import com.DTISE.ShelfMasterBE.infrastructure.payment.dto.PaymentStatusResponse;
-//import com.DTISE.ShelfMasterBE.usecase.payment.CheckPaymentStatusUsecase;
-//import com.DTISE.ShelfMasterBE.usecase.payment.CreatePaymentUsecase;
-//import jakarta.validation.Valid;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.*;
