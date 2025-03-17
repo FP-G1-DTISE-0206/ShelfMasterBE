@@ -12,6 +12,7 @@ import com.DTISE.ShelfMasterBE.usecase.userAddress.DeleteUserAddressUsecase;
 import com.DTISE.ShelfMasterBE.usecase.userAddress.GetUserAddressUsecase;
 import com.DTISE.ShelfMasterBE.usecase.userAddress.UpdateUserAddressUsecase;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,6 +53,7 @@ public class UserController {
         return ApiResponse.successfulResponse("User address retrieved successfully", getUserAddressUsecase.getUserAddress(email));
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
     @PostMapping("/address")
     public ResponseEntity<?> createUserAddress(@RequestBody @Validated UserAddressRequest req) {
         String email = Claims.getEmailFromJwt();
@@ -64,12 +66,14 @@ public class UserController {
         return ApiResponse.successfulResponse("User address retrieved successfully", getUserAddressUsecase.getUserAddressById(id, email));
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
     @PutMapping("/address/{id}")
     public ResponseEntity<?> updateUserAddress(@PathVariable Long id, @RequestBody @Validated UserAddressRequest req) {
         String email = Claims.getEmailFromJwt();
         return ApiResponse.successfulResponse("User address updated successfully", updateUserAddressUsecase.updateUserAddress(id, req, email));
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
     @DeleteMapping("/address/{id}")
     public ResponseEntity<?> deleteUserAddress(@PathVariable Long id) {
         String email = Claims.getEmailFromJwt();
@@ -77,6 +81,7 @@ public class UserController {
         return ApiResponse.successfulResponse("User address deleted successfully");
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
     @PatchMapping("/address/{id}/set-default")
     public ResponseEntity<?> setDefaultAddress(@PathVariable Long id) {
          String email = Claims.getEmailFromJwt();
