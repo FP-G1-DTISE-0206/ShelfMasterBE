@@ -9,9 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
-import java.time.OffsetDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,7 +19,7 @@ public class CreateCartItemRequest {
 
     @NotNull(message = "Quantity cannot be null")
     @Min(value = 1, message = "Quantity must be at least 1")
-    private Integer quantity;
+    private Long quantity;
 
     public Cart toEntity(User user, Product product) {
         Cart cart = new Cart();

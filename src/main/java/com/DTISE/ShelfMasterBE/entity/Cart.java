@@ -1,15 +1,16 @@
 package com.DTISE.ShelfMasterBE.entity;
 
-import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -39,7 +40,7 @@ public class Cart {
     @NotNull
     @ColumnDefault("0")
     @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Long quantity;
 
     @NotNull
     @ColumnDefault("FALSE")
@@ -47,13 +48,11 @@ public class Cart {
     private Boolean isProcessed = false;
 
     @NotNull
-//    @ColumnDefault("CURRENT_TIMESTAMP")
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     @NotNull
-//    @ColumnDefault("CURRENT_TIMESTAMP")
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;

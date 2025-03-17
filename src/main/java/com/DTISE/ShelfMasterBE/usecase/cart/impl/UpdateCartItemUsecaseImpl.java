@@ -8,6 +8,7 @@ import com.DTISE.ShelfMasterBE.usecase.cart.UpdateCartItemUsecase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
 
@@ -27,6 +28,8 @@ public class UpdateCartItemUsecaseImpl implements UpdateCartItemUsecase {
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
         cart.setQuantity(request.getQuantity());
+//        cart.setWeight(cart.getProduct().getWeight().multiply(BigDecimal.valueOf(cart.getQuantity())));
+//        cart.setSku(cart.getProduct().getSku());
         cart.setUpdatedAt(OffsetDateTime.now());
         cartRepository.save(cart);
 
@@ -35,6 +38,8 @@ public class UpdateCartItemUsecaseImpl implements UpdateCartItemUsecase {
                 cart.getProduct().getId(),
                 cart.getProduct().getName(),
                 cart.getQuantity(),
+                cart.getProduct().getWeight(),
+                cart.getProduct().getSku(),
                 cart.getIsProcessed(),
                 cart.getUpdatedAt()
         );
