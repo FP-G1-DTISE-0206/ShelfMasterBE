@@ -8,6 +8,8 @@ import com.DTISE.ShelfMasterBE.usecase.cart.AddToCartUsecase;
 import com.DTISE.ShelfMasterBE.usecase.cart.GetCartUsecase;
 import com.DTISE.ShelfMasterBE.usecase.cart.RemoveCartItemUsecase;
 import com.DTISE.ShelfMasterBE.usecase.cart.UpdateCartItemUsecase;
+import com.DTISE.ShelfMasterBE.usecase.productMutation.OrderMutationUseCase;
+import com.DTISE.ShelfMasterBE.usecase.productMutation.impl.OrderMutationUseCaseImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +22,16 @@ public class CartController {
     private final GetCartUsecase getCartUsecase;
     private final UpdateCartItemUsecase updateCartItemUsecase;
     private final RemoveCartItemUsecase removeCartItemUsecase;
+    private final OrderMutationUseCase orderMutationUseCase;
 
-    public CartController(AddToCartUsecase addToCartUsecase, GetCartUsecase getCartUsecase, UpdateCartItemUsecase updateCartItemUsecase, RemoveCartItemUsecase removeCartItemUsecase) {
+
+    public CartController(AddToCartUsecase addToCartUsecase, GetCartUsecase getCartUsecase, UpdateCartItemUsecase updateCartItemUsecase, RemoveCartItemUsecase removeCartItemUsecase, OrderMutationUseCase orderMutationUseCase) {
         this.addToCartUsecase = addToCartUsecase;
         this.getCartUsecase = getCartUsecase;
         this.updateCartItemUsecase = updateCartItemUsecase;
         this.removeCartItemUsecase = removeCartItemUsecase;
+        this.orderMutationUseCase = orderMutationUseCase;
+
     }
 
 
@@ -58,6 +64,14 @@ public class CartController {
             @Valid @RequestBody UpdateCartItemRequest request) {
         UpdateCartItemResponse response = updateCartItemUsecase.execute(cartId, request);
         return ApiResponse.successfulResponse("Cart item updated successfully", response);
+    }
+
+    @GetMapping("/product-stock/{id}")
+    public ResponseEntity<?> getTotalProductStock(@PathVariable Long id) {
+        return ApiResponse.successfulResponse(
+                "Total product stock retrieved successfully",
+                orderMutationUseCase.getProductTotalStock(id)
+        );
     }
 
 }

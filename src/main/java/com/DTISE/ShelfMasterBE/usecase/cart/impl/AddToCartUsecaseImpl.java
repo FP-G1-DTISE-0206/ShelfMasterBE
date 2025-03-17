@@ -13,6 +13,7 @@ import com.DTISE.ShelfMasterBE.usecase.cart.AddToCartUsecase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -55,6 +56,9 @@ public class AddToCartUsecaseImpl implements AddToCartUsecase {
             cart = request.toEntity(user, product);
         }
 
+//        cart.setSku(product.getSku());
+//        cart.setWeight(product.getWeight().multiply(BigDecimal.valueOf(request.getQuantity())));
+
         cartRepository.save(cart);
 
         return new CreateCartItemResponse(
@@ -62,6 +66,8 @@ public class AddToCartUsecaseImpl implements AddToCartUsecase {
                 cart.getProduct().getId(),
                 cart.getProduct().getName(),
                 cart.getQuantity(),
+                cart.getProduct().getWeight(),
+                cart.getProduct().getSku(),
                 cart.getIsProcessed(),
                 cart.getCreatedAt(),
                 cart.getUpdatedAt()

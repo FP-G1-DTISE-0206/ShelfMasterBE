@@ -39,7 +39,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.orderId = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -75,7 +75,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.orderId = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -107,7 +107,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.orderId = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -149,7 +149,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.orderId = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -171,7 +171,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.orderId = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -189,7 +189,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
     @Query("""
        SELECT DISTINCT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.SalesReportResponse(
             pmo.id,
-            oi.orderId,
+            oi.order.id,
             p.id,
             p.name,
             CASE
@@ -202,7 +202,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.orderId = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId
            JOIN pm.product p
            JOIN p.categories c
        WHERE pmo.returnedProductMutationId IS NULL
@@ -213,7 +213,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
            AND pm.mutationType.destinationType = :destinationType
-       GROUP BY pmo.id, oi.orderId, p.id, p.name, c.name, oi.quantity, oi.totalPrice, pmo.createdAt
+       GROUP BY pmo.id, oi.order.id, p.id, p.name, c.name, oi.quantity, oi.totalPrice, pmo.createdAt
     """)
     Page<SalesReportResponse> getSalesReportPreview(
             Pageable pageable,
@@ -228,7 +228,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
     @Query("""
        SELECT DISTINCT new com.DTISE.ShelfMasterBE.infrastructure.report.dto.SalesReportResponse(
             pmo.id,
-            oi.orderId,
+            oi.order.id,
             p.id,
             p.name,
             CASE
@@ -241,7 +241,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.orderId = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId
            JOIN pm.product p
            JOIN p.categories c
        WHERE pmo.returnedProductMutationId IS NULL
@@ -252,7 +252,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
            AND pm.mutationType.destinationType = :destinationType
-       GROUP BY pmo.id, oi.orderId, p.id, p.name, c.name, oi.quantity, oi.totalPrice, pmo.createdAt
+       GROUP BY pmo.id, oi.order.id, p.id, p.name, c.name, oi.quantity, oi.totalPrice, pmo.createdAt
     """)
     List<SalesReportResponse> getSalesReport(
             @Param("originType") MutationEntityType originType,
