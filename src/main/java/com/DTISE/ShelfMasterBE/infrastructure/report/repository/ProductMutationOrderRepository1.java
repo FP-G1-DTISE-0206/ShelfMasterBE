@@ -39,7 +39,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.order.id = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId AND oi.product.id = pm.product.id
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -75,7 +75,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.order.id = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId AND oi.product.id = pm.product.id
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -107,7 +107,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.order.id = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId AND oi.product.id = pm.product.id
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -149,7 +149,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.order.id = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId AND oi.product.id = pm.product.id
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
@@ -171,7 +171,7 @@ public interface ProductMutationOrderRepository1 extends JpaRepository<ProductMu
        )
        FROM ProductMutationOrder pmo
            JOIN ProductMutation pm ON pm.id = pmo.orderedProductMutationId
-           JOIN OrderItem oi ON oi.order.id = pmo.orderId
+           JOIN OrderItem oi ON oi.order.id = pmo.orderId AND oi.product.id = pm.product.id
        WHERE pmo.returnedProductMutationId IS NULL
            AND (:warehouseId IS NULL
                OR (pm.mutationType.originType = :originType AND pm.originId = :warehouseId))
