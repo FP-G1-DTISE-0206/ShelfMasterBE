@@ -434,6 +434,21 @@ CREATE TABLE "public"."cart" (
     WITH ( OIDS=FALSE );
 
 -- -----------------------------------
+-- "public"."payment_method"
+-- -----------------------------------
+
+DROP TABLE IF EXISTS "public"."payment_method" CASCADE;
+
+CREATE TABLE "public"."payment_method" (
+                                "id"    BIGSERIAL NOT NULL,
+                                "name"  CHARACTER VARYING(255) NOT NULL,
+                                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                "deleted_at" TIMESTAMP WITH TIME ZONE,
+                                PRIMARY KEY ( "id" )
+);
+
+-- -----------------------------------
 -- Foreign Keys
 -- -----------------------------------
 
